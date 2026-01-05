@@ -145,13 +145,12 @@
     </div>
 
     <script>
+        <script>
         // === CONFIGURACIÓN DE LINKS ===
-        // Aquí pegas los links largos de Google Apps Script de cada compañía
         const DIRECTORIO = {
             "san_bernardo": {
-                "1": "https://script.google.com/macros/s/AKfycbz1AHAomA0HvHVjj0HanD5Z_8ofJxaehJ48aAKhSke8pWxI5Q77R0Rfhn52W2Jyq5Wx/exec",
-                
-            },
+                "1": "https://script.google.com/macros/s/AKfycbz1AHAomA0HvHVjj0HanD5Z_8ofJxaehJ48aAKhSke8pWxI5Q77R0Rfhn52W2Jyq5Wx/exec"
+            }
         };
 
         function cargarCompanias() {
@@ -201,9 +200,11 @@
                         Swal.showLoading();
                     }
                 }).then(() => {
+                    // AQUÍ ESTABA EL ERROR: Se agregó la comilla de cierre y el punto y coma
                     document.body.innerHTML = `
                         <iframe src="${urlDestino}" style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
                         </iframe>
+                    `;
                 });
             } else {
                 Swal.fire('Error', 'Sistema no disponible para esta compañía aún.', 'warning');
