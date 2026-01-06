@@ -1,16 +1,18 @@
 /**
  * auth_backend.js
- * Lógica de Autenticación conectada a Supabase.
+ * Lógica de Autenticación - Versión Corregida
  */
 
 async function login(rolSolicitado, rut, clave) {
+    console.log("Intentando login...", rolSolicitado, rut);
+
     // 1. Normalizar RUT
     const rBusq = normalizarRut(rut);
 
-    // 2. Lógica para CONDUCTORES (Sin clave, tabla separada)
+    // 2. Lógica para CONDUCTORES (Tabla separada, sin clave)
     if (rolSolicitado === 'conductor') {
         const { data: conductor, error } = await clienteSupabase
-            .from('conductores')
+            .from('conductores') // Asegúrate que esta tabla exista en Supabase
             .select('*')
             .eq('rut', rBusq)
             .single();
@@ -39,8 +41,10 @@ async function login(rolSolicitado, rut, clave) {
         return { ok: false, msg: "Usuario no encontrado en registros." };
     }
 
-    // Validar estado
-    if (voluntario.estado !== 'ACTIVO' && voluntario.estado !== 'SI') {
+    // Validar estado (ACTIVO o SI)
+    // Nota: Ajusta esto según cómo guardes el estado en tu BD ('ACTIVO', 'SI', etc.)
+    const estado = (voluntario.estado || '').toUpperCase();
+    if (estado !== 'ACTIVO' && estado !== 'SI') {
         return { ok: false, msg: "Usuario inactivo o suspendido." };
     }
 
@@ -80,6 +84,7 @@ async function login(rolSolicitado, rut, clave) {
 
     let paginaDestino = destinos[rolSol] || 'index';
 
+    // Retorno final
     return { 
         ok: true, 
         page: paginaDestino, 
