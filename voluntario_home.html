@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Voluntario</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+      --success-gradient: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+      --danger-gradient: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+      /* Nuevos gradientes para Guardia y Pizarra */
+      --info-gradient: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+      --warning-gradient: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+      --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      --hover-transform: translateY(-5px);
+    }
+
+    body {
+      background-color: #f8f9fc;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .header-bg {
+      background: var(--primary-gradient);
+      color: white;
+      padding-bottom: 3rem;
+      border-radius: 0 0 2rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .welcome-text {
+      font-weight: 300;
+      opacity: 0.9;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .menu-card {
+      border: none;
+      border-radius: 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--card-shadow);
+      height: 100%;
+      background: white;
+    }
+
+    .menu-card:hover {
+      transform: var(--hover-transform);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .card-icon-wrapper {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-icon {
+      font-size: 2.5rem;
+      color: white;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .card-title {
+      font-weight: 600;
+      color: #5a5c69;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-text {
+      font-size: 0.85rem;
+      color: #858796;
+    }
+
+    /* Colores Específicos por Tarjeta */
+    .card-actos .card-icon { background: var(--primary-gradient); }
+    .card-hoja .card-icon { background: var(--success-gradient); }
+    .card-guardia .card-icon { background: var(--danger-gradient); }
+    .card-pizarra .card-icon { background: var(--info-gradient); }
+    .card-academia .card-icon { background: var(--warning-gradient); }
+  </style>
+</head>
+<body>
+
+  <div class="header-bg pt-4 pb-5">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="welcome-text mb-0">Bienvenido al Panel,</h5>
+          <div class="user-name"><span id="nombreDisplay">Cargando...</span></div>
+          <small class="opacity-75"><span id="rolDisplay"></span></small>
+        </div>
+        <div class="text-end">
+          <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 50px; height: 50px;">
+            <i class="fas fa-user"></i>
+          </div>
+          <small class="d-block mt-1 opacity-75"><span id="rutDisplay"></span></small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="margin-top: -3rem;">
+    <div class="row g-4">
+      
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-card card-actos p-4 text-center" onclick="navegar('voluntario_actos')">
+          <div class="card-icon-wrapper">
+            <div class="card-icon"><i class="fas fa-fire-extinguisher"></i></div>
+          </div>
+          <h5 class="card-title">Mis Actos del Servicio</h5>
+          <p class="card-text">Revisa tu asistencia a llamados y actos.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-card card-hoja p-4 text-center" onclick="navegar('hoja_vida')">
+          <div class="card-icon-wrapper">
+            <div class="card-icon"><i class="fas fa-file-invoice"></i></div>
+          </div>
+          <h5 class="card-title">Mi Hoja de Vida</h5>
+          <p class="card-text">Genera y visualiza tu hoja de vida completa.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-card card-guardia p-4 text-center" onclick="navegar('solicitud_guardia')">
+          <div class="card-icon-wrapper">
+            <div class="card-icon"><i class="fas fa-bed"></i></div>
+          </div>
+          <h5 class="card-title">Solicitud de Guardia</h5>
+          <p class="card-text">Postula a los turnos de guardia nocturna.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-card card-pizarra p-4 text-center" onclick="navegar('pizarra_home')">
+          <div class="card-icon-wrapper">
+            <div class="card-icon"><i class="fas fa-chalkboard"></i></div>
+          </div>
+          <h5 class="card-title">Pizarra Digital</h5>
+          <p class="card-text">Órdenes del día, actas y citaciones.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-card card-academia p-4 text-center" onclick="navegar('voluntario_asistencia')">
+          <div class="card-icon-wrapper">
+            <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+          </div>
+          <h5 class="card-title">Mis Asistencias</h5>
+          <p class="card-text">Registro de academias y listas de asistencia.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="menu-card p-4 text-center" onclick="navegar('voluntario_carros')" style="box-shadow: var(--card-shadow);">
+          <div class="card-icon-wrapper">
+            <div class="card-icon" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);"><i class="fas fa-truck"></i></div>
+          </div>
+          <h5 class="card-title">Material Mayor</h5>
+          <p class="card-text">Revisa inventario y estado de carros.</p>
+        </div>
+      </div>
+
+       <div class="col-md-6 col-lg-4">
+        <div class="menu-card p-4 text-center" onclick="navegar('voluntario_clave')">
+          <div class="card-icon-wrapper">
+            <div class="card-icon" style="background: linear-gradient(135deg, #343a40 0%, #212529 100%);"><i class="fas fa-key"></i></div>
+          </div>
+          <h5 class="card-title">Cambiar Clave</h5>
+          <p class="card-text">Actualiza tu contraseña de acceso.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="text-center mt-5 mb-4 text-muted small">
+       &copy; 2026 Ignis - Cuerpo de Bomberos
+       <br>
+       <a href="#" onclick="cerrarSesion()" class="text-decoration-none text-danger fw-bold mt-2 d-inline-block">
+         <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+       </a>
+    </div>
+  </div>
+
+  <script>
+    // Variables globales para mantener la identidad del usuario
+    let usuarioActual = {
+      rut: '',
+      nombre: '',
+      rol: ''
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Recuperar parámetros de la URL (Login nos manda aquí con datos)
+      const params = new URLSearchParams(window.location.search);
+      usuarioActual.rut = params.get('rut') || '';
+      usuarioActual.nombre = params.get('nombre') || 'Voluntario';
+      usuarioActual.rol = params.get('rol') || 'Voluntario';
+
+      // 2. Pintar datos en el Header
+      document.getElementById('nombreDisplay').innerText = usuarioActual.nombre;
+      document.getElementById('rutDisplay').innerText = usuarioActual.rut;
+      document.getElementById('rolDisplay').innerText = usuarioActual.rol;
+    });
+
+    function navegar(paginaDestino) {
+      const { rut, nombre, rol } = usuarioActual;
+
+      // CASO ESPECIAL: HOJA DE VIDA
+      if (paginaDestino === 'hoja_vida') {
+          // Abrimos la hoja de vida en una pestaña nueva para imprimir
+          // Esto reemplaza el comportamiento antiguo de google.script.run.obtenerHojaVida
+          // Usaremos el archivo "print_hoja_vida.html" que ya tienes.
+          const urlHoja = `print_hoja_vida.html?rut=${encodeURIComponent(rut)}`;
+          
+          Swal.fire({
+            title: 'Generando Reporte',
+            text: 'Abriendo hoja de vida...',
+            icon: 'info',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+             window.open(urlHoja, '_blank');
+          });
+          return; 
+      }
+
+      // CASO NORMAL: NAVEGACIÓN
+      Swal.fire({
+        title: 'Cargando...',
+        didOpen: () => Swal.showLoading(),
+        background: 'transparent',
+        color: 'white',
+        backdrop: 'rgba(0,0,0,0.8)',
+        showConfirmButton: false
+      });
+
+      // Construimos la URL destino pasando los parámetros para no perder la sesión
+      const urlFinal = `${paginaDestino}.html?rut=${encodeURIComponent(rut)}&nombre=${encodeURIComponent(nombre)}&rol=${encodeURIComponent(rol)}`;
+      
+      setTimeout(() => {
+          window.location.href = urlFinal;
+      }, 300); // Pequeño delay para que se vea el loading
+    }
+
+    function cerrarSesion() {
+        Swal.fire({
+            title: '¿Cerrar Sesión?',
+            text: "Volverás a la pantalla de ingreso",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, salir'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'index.html';
+            }
+        });
+    }
+  </script>
+</body>
+</html>
