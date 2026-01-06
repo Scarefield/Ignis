@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hoja de Vida</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/hoja_vida_logic.js"></script>
+
+  <style>
+    @page { size: A4; margin: 2cm; }
+    body { font-family: "Times New Roman", Times, serif; color: #000; line-height: 1.4; background: #fff; margin: 20px; }
+    
+    /* TU CSS ORIGINAL EXACTO */
+    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+    .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; }
+    .header h2 { margin: 5px 0 0 0; font-size: 16px; font-weight: normal; }
+    
+    .section-title { 
+      background-color: #eee; border: 1px solid #000; padding: 5px; font-weight: bold; 
+      margin-top: 20px; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; 
+    }
+    
+    .info-grid { display: table; width: 100%; margin-bottom: 10px; }
+    .info-row { display: table-row; }
+    .info-cell { display: table-cell; padding: 4px; width: 25%; font-size: 13px; }
+    .label { font-weight: bold; }
+    
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px; }
+    .data-table th, .data-table td { border: 1px solid #000; padding: 5px; }
+    .data-table th { background-color: #f0f0f0; text-align: left; }
+
+    #loader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: sans-serif; font-size: 20px; background: white; padding: 20px; border: 1px solid #000; }
+  </style>
+</head>
+<body>
+
+  <div id="loader">Generando Documento...</div>
+
+  <div id="documento" style="display:none;">
+    
+    <div class="header">
+      <h1 id="hCuerpo">CUERPO DE BOMBEROS</h1>
+      <h2 id="hCompania">HOJA DE VIDA INDIVIDUAL</h2>
+    </div>
+
+    <div class="section-title">I. Identificación Personal</div>
+    <div class="info-grid">
+      <div class="info-row">
+        <div class="info-cell"><span class="label">Nombre:</span> <span id="valNombre"></span></div>
+        <div class="info-cell"><span class="label">RUT:</span> <span id="valRut"></span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-cell"><span class="label">Fecha Nac.:</span> <span id="valNac"></span></div>
+        <div class="info-cell"><span class="label">Grupo Sang.:</span> <span id="valSangre"></span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-cell"><span class="label">Estado Civil:</span> <span id="valCivil"></span></div>
+        <div class="info-cell"><span class="label">Profesión:</span> <span id="valProf"></span></div>
+      </div>
+       <div class="info-row">
+        <div class="info-cell"><span class="label">Dirección:</span> <span id="valDir"></span></div>
+        <div class="info-cell"><span class="label">Teléfono:</span> <span id="valTel"></span></div>
+      </div>
+    </div>
+
+    <div class="section-title">II. Antecedentes de Ingreso</div>
+    <div class="info-grid">
+      <div class="info-row">
+        <div class="info-cell"><span class="label">Fecha Ingreso:</span> <span id="valIngreso"></span></div>
+        <div class="info-cell"><span class="label">N° Registro:</span> <span id="valReg"></span></div>
+      </div>
+    </div>
+
+    <div class="section-title">III. Historial de Cargos</div>
+    <table class="data-table" id="tablaCargos">
+      <thead><tr><th>Cargo</th><th width="20%">Desde</th><th width="20%">Hasta</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="section-title">IV. Premios y Distinciones</div>
+    <table class="data-table" id="tablaPremios">
+      <thead><tr><th>Premio</th><th width="20%">Año</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="section-title">V. Historial Disciplinario</div>
+    <table class="data-table" id="tablaCastigos">
+      <thead><tr><th>Medida / Sanción</th><th width="20%">Fecha</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <div style="margin-top: 50px; text-align: center; font-size: 12px;">
+      <p>Certificado generado automáticamente por sistema IGNIS v2.0</p>
+      <p>Fecha de emisión: <span id="fechaEmision"></span></p>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async function() {
+      // 1. Obtener RUT de la URL
+      const params = new URLSearchParams(window.location.search);
+      const rut = params.get('rut');
+
+      if (!rut) {
+        document.getElementById('loader').innerText = "Error: No se especificó un voluntario.";
+        return;
+      }
+
+      // 2. Traer datos
+      const datos = await generarDatosHojaVida(rut);
+
+      if (!datos) {
+        document.getElementById('loader').innerText = "Error: Voluntario no encontrado.";
+        return;
+      }
+
+      // 3. Llenar Campos Simples
+      const set = (id, val) => document.getElementById(id).innerText = val || "-";
+      
+      set('valNombre', datos.nombre);
+      set('valRut', datos.rut);
+      set('valNac', datos.fechaNacimiento);
+      set('valSangre', datos.grupoSanguineo);
+      set('valCivil', datos.estadoCivil);
+      set('valProf', datos.profesion);
+      set('valDir', datos.direccion);
+      set('valTel', datos.telefono);
+      set('valIngreso', datos.fechaIngreso);
+      
+      // 4. Llenar Tablas Dinámicas
+      llenarTabla('tablaCargos', datos.cargos, (c) => `<td>${c.cargo}</td><td>${c.anio_inicio}</td><td>${c.anio_fin || 'Actual'}</td>`);
+      llenarTabla('tablaPremios', datos.premiosCompania, (p) => `<td>${p.premio}</td><td align="center">${p.anio}</td>`);
+      llenarTabla('tablaCastigos', datos.amonestaciones, (a) => `<td>${a.medida}</td><td align="center">${a.fecha}</td>`);
+
+      // 5. Finalizar
+      document.getElementById('fechaEmision').innerText = new Date().toLocaleDateString();
+      document.title = "Hoja de Vida - " + datos.nombre;
+      
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('documento').style.display = 'block';
+
+      // Auto-imprimir (Opcional, igual que tu original)
+      setTimeout(() => window.print(), 1000);
+    });
+
+    function llenarTabla(idTabla, arrayDatos, renderFn) {
+      const tbody = document.getElementById(idTabla).querySelector('tbody');
+      tbody.innerHTML = "";
+      if (!arrayDatos || arrayDatos.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='3' style='text-align:center;color:#777;'>Sin registros</td></tr>";
+        return;
+      }
+      arrayDatos.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = renderFn(item);
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
