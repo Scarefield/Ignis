@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Times+New+Roman&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/guardia_backend.js"></script>
+
+  <style>
+    /* TUS ESTILOS EXACTOS */
+    body { background-color: #f0f2f5; font-family: 'Roboto', sans-serif; padding: 20px; }
+    .template-container { background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 30px; }
+    .section-title { color: #d32f2f; font-weight: bold; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 20px; }
+    .form-label { font-weight: 500; color: #555; }
+    
+    /* Estilos Impresión (Resumen) */
+    @media print {
+      body * { visibility: hidden; }
+      .printing-resumen, .printing-resumen * { visibility: visible; }
+      .printing-resumen { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+     <h3 class="text-danger fw-bold"><i class="fas fa-user-shield me-2"></i>Panel Jefe de Guardia</h3>
+     <button class="btn btn-outline-secondary" onclick="window.location.href='index.html'">Volver</button>
+  </div>
+
+  <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" id="bitacora-tab" data-bs-toggle="tab" data-bs-target="#bitacora-pane" type="button">Bitácora Diaria</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen-pane" type="button">Resumen Mensual</button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="myTabContent">
+    
+    <div class="tab-pane fade show active" id="bitacora-pane">
+       <div class="template-container">
+          <h5 class="section-title">Registro Diario de Guardia</h5>
+          
+          <div class="row g-3">
+             <div class="col-md-3">
+                <label class="form-label">Fecha</label>
+                <input type="date" id="bFecha" class="form-control" onchange="cargarDatosBitacora()">
+             </div>
+             <div class="col-md-3">
+                <label class="form-label">Jefe de Guardia</label>
+                <input type="text" id="bJefe" class="form-control" readonly>
+             </div>
+             <div class="col-md-3">
+                <label class="form-label">Hora Inicio</label>
+                <input type="time" id="bHoraInicio" class="form-control" value="23:30">
+             </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+             <div class="col-12">
+                <label class="form-label">Personal de Guardia (Presentes)</label>
+                <textarea id="bPresentes" class="form-control" rows="2" placeholder="Nombres de voluntarios..."></textarea>
+                <div class="form-text text-end"><a href="#" onclick="copiarPermanentes()">Copiar Permanentes de Hoy</a></div>
+             </div>
+          </div>
+          
+          <hr>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+               <label class="form-label">Novedades Material Mayor/Menor</label>
+               <textarea id="bMaterial" class="form-control" rows="3">Sin novedades.</textarea>
+            </div>
+            <div class="col-md-6">
+               <label class="form-label">Novedades Cuartel</label>
+               <textarea id="bCuartel" class="form-control" rows="3">Sin novedades.</textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 text-end">
+             <button class="btn btn-danger btn-lg" onclick="guardarBitacora()">
+                <i class="fas fa-save me-2"></i> Guardar Bitácora
+             </button>
+          </div>
+       </div>
+    </div>
+
+    <div class="tab-pane fade" id="resumen-pane">
+        <div class="template-container" id="areaImpresion">
+           <div class="d-flex justify-content-between align-items-end mb-3 no-print">
+              <div>
+                 <label class="form-label">Mes</label>
+                 <input type="month" id="resumenMes" class="form-control">
+              </div>
+              <button class="btn btn-primary" onclick="generarResumen()">Generar</button>
+              <button class="btn btn-secondary" onclick="imprimirResumen()"><i class="fas fa-print"></i></button>
+           </div>
+           
+           <div id="tablaResumenContainer">
+              <div class="alert alert-light text-center">Seleccione mes y click en Generar</div>
+           </div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      // Set fecha hoy
+      const hoy = new Date().toISOString().split('T')[0];
+      document.getElementById('bFecha').value = hoy;
+      
+      // Cargar datos usuario actual (Jefe)
+      const u = JSON.parse(localStorage.getItem('usuario_ignis') || '{}');
+      if(u.nombre) document.getElementById('bJefe').value = u.nombre;
+
+      // Cargar si ya existe bitácora hoy
+      cargarDatosBitacora();
+  });
+
+  async function cargarDatosBitacora() {
+     const fecha = document.getElementById('bFecha').value;
+     if(!fecha) return;
+
+     Swal.fire({title:'Cargando...', didOpen:()=>Swal.showLoading()});
+     
+     const datos = await getBitacoraDia(fecha); // Backend JS
+     Swal.close();
+
+     if(datos) {
+        document.getElementById('bHoraInicio').value = datos.hora_inicio || "23:30";
+        document.getElementById('bPresentes').value = datos.presentes || "";
+        document.getElementById('bMaterial').value = datos.estado_material || "Sin novedades.";
+        document.getElementById('bCuartel').value = datos.estado_cuartel || "Sin novedades.";
+        if(datos.jefe_nombre) document.getElementById('bJefe').value = datos.jefe_nombre;
+     } else {
+        // Limpiar si no hay datos
+        document.getElementById('bPresentes').value = "";
+        document.getElementById('bMaterial').value = "Sin novedades.";
+        document.getElementById('bCuartel').value = "Sin novedades.";
+     }
+  }
+
+  async function copiarPermanentes() {
+     const fecha = document.getElementById('bFecha').value;
+     // Lógica: Traer del calendario quién toca hoy
+     const lista = await getPermanentesDia(fecha); // Backend JS
+     document.getElementById('bPresentes').value = lista.join(", ");
+  }
+
+  async function guardarBitacora() {
+     const bitacora = {
+        fecha: document.getElementById('bFecha').value,
+        hora_inicio: document.getElementById('bHoraInicio').value,
+        presentes: document.getElementById('bPresentes').value,
+        estado_material: document.getElementById('bMaterial').value,
+        estado_cuartel: document.getElementById('bCuartel').value,
+        jefe_nombre: document.getElementById('bJefe').value
+     };
+
+     if(!bitacora.fecha) return Swal.fire("Error","Falta Fecha","warning");
+
+     const res = await saveBitacora(bitacora); // Backend JS
+     if(res.ok) Swal.fire("Éxito", "Bitácora guardada correctamente", "success");
+     else Swal.fire("Error", "No se pudo guardar", "error");
+  }
+
+  async function generarResumen() {
+      const val = document.getElementById('resumenMes').value; // YYYY-MM
+      if(!val) return;
+      
+      const [anio, mes] = val.split('-');
+      
+      Swal.fire({title:'Calculando...', didOpen:()=>Swal.showLoading()});
+      const lista = await getResumenGuardias(anio, mes); // Backend JS
+      Swal.close();
+
+      const div = document.getElementById('tablaResumenContainer');
+      let html = `
+          <h4 class="text-center mb-3">Resumen Asistencia Guardia - ${mes}/${anio}</h4>
+          <table class="table table-bordered table-sm">
+          <thead class="table-light">
+            <tr>
+              <th>Voluntario</th>
+              <th>Tipo</th>
+              <th class="text-center">Noches Totales</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      lista.forEach(item => {
+        const estilo = item.noches > 0 ? 'fw-bold text-success' : 'text-muted';
+        html += `
+          <tr>
+            <td>${item.nombre}</td>
+            <td class="small">${item.tipo || ''}</td>
+            <td class="text-center ${estilo}" style="font-size:1.1em;">${item.noches}</td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      div.innerHTML = html;
+  }
+
+  function imprimirResumen() {
+    const original = document.body.innerHTML;
+    const printContent = document.getElementById('areaImpresion').innerHTML;
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = original;
+    location.reload(); // Para restaurar eventos
+  }
+</script>
+</body>
+</html>
