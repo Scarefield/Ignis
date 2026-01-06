@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <title>Tesorería - Ignis</title>
+  
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -39,15 +42,6 @@
     .bg-ordinaria { background-color: #e3f2fd; color: #1565c0; }
     .bg-extra { background-color: #fff3e0; color: #ef6c00; }
 
-    /* Tabs */
-    .nav-pills .nav-link { border-radius: 8px; color: #555; font-weight: 500; padding: 10px 20px; }
-    .nav-pills .nav-link.active { background-color: var(--primary); color: white; box-shadow: 0 4px 6px rgba(13, 71, 161, 0.3); }
-
-    /* Forms */
-    .form-label { font-weight: 500; font-size: 0.9rem; }
-    .form-control, .form-select { border-radius: 8px; border: 1px solid #ddd; padding: 10px; }
-    .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1); }
-
     /* Loader */
     #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999; text-align: center; padding-top: 20%; }
     .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
@@ -63,7 +57,7 @@
     <div class="header-bar">
       <div class="header-title">
         <h2><i class="fas fa-wallet me-2"></i>Tesorería</h2>
-        <small>Gestión Financiera de la Compañía</small>
+        <small>Gestión Financiera - Ignis V2</small>
       </div>
       <div>
         <button class="btn btn-outline-secondary btn-sm" onclick="window.location.href='index.html'">
@@ -73,18 +67,10 @@
     </div>
 
     <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
-      <li class="nav-item">
-        <button class="nav-link active" id="tab-dashboard" data-bs-toggle="pill" data-bs-target="#content-dashboard" type="button">Dashboard</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" id="tab-pagos" data-bs-toggle="pill" data-bs-target="#content-pagos" type="button">Registrar Pago</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" id="tab-historial" data-bs-toggle="pill" data-bs-target="#content-historial" type="button">Historial</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" id="tab-admin" data-bs-toggle="pill" data-bs-target="#content-admin" type="button">Administración</button>
-      </li>
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#content-dashboard">Dashboard</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-pagos">Registrar Pago</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-historial">Historial</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-admin">Administración</button></li>
     </ul>
 
     <div class="tab-content" id="pills-tabContent">
@@ -104,8 +90,8 @@
           <div class="col-md-4">
             <div class="stat-card orange">
               <div class="stat-label">Morosidad Total</div>
-              <div class="stat-value text-warning" id="dashMorosidad">Calculando...</div>
-              <small class="text-muted">Voluntarios con deuda > 3 meses</small>
+              <div class="stat-value text-warning" id="dashMorosidad">...</div>
+              <small class="text-muted">Cuotas ordinarias vencidas</small>
             </div>
           </div>
           <div class="col-md-4">
@@ -116,13 +102,6 @@
             </div>
           </div>
         </div>
-        
-        <div class="table-container">
-          <h5 class="mb-3 text-secondary"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Alertas de Morosidad</h5>
-          <div class="alert alert-info">
-            La lista de morosos se calculará automáticamente en base a las cuotas impagas.
-          </div>
-        </div>
       </div>
 
       <div class="tab-pane fade" id="content-pagos">
@@ -131,15 +110,15 @@
             <div class="table-container mb-3">
               <h5 class="mb-3">Nuevo Pago</h5>
               <div class="mb-3">
-                <label class="form-label">Buscar Voluntario</label>
-                <input type="text" id="busqVoluntario" class="form-control" placeholder="Escriba nombre o RUT..." onkeyup="filtrarTablaDeudas()">
+                <input type="text" id="busqVoluntario" class="form-control" placeholder="Buscar por Nombre o RUT..." onkeyup="filtrarTablaDeudas()">
               </div>
-              <div class="alert alert-warning small">
-                <i class="fas fa-info-circle me-1"></i> Seleccione una deuda de la lista de la derecha para pagar.
-              </div>
+              
               <form id="formPago" style="display:none;">
                 <input type="hidden" id="pagoIdDeuda">
-                <input type="hidden" id="pagoTipoDeuda"> <div class="mb-2">
+                <input type="hidden" id="pagoOrigen"> 
+                <input type="hidden" id="pagoRutVol">
+                
+                <div class="mb-2">
                   <label class="form-label">Voluntario</label>
                   <input type="text" id="pagoNombre" class="form-control bg-light" readonly>
                 </div>
@@ -176,17 +155,8 @@
               </div>
               <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                 <table class="table table-hover align-middle">
-                  <thead style="position: sticky; top: 0; z-index: 1;">
-                    <tr>
-                      <th>Voluntario</th>
-                      <th>Tipo</th>
-                      <th>Detalle</th>
-                      <th>Monto</th>
-                      <th>Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tablaDeudas">
-                    </tbody>
+                  <thead><tr><th>Voluntario</th><th>Tipo</th><th>Detalle</th><th>Monto</th><th></th></tr></thead>
+                  <tbody id="tablaDeudas"></tbody>
                 </table>
               </div>
             </div>
@@ -199,50 +169,37 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5>Historial de Transacciones</h5>
             <div>
-               <input type="text" id="filtroHistorial" class="form-control form-control-sm d-inline-block w-auto" placeholder="Filtrar..." onkeyup="filtrarHistorial()">
-               <button class="btn btn-sm btn-success ms-2" onclick="exportarExcel()"><i class="fas fa-file-excel me-1"></i> Excel</button>
+              <button class="btn btn-sm btn-primary" onclick="cargarHistorial()"><i class="fas fa-sync"></i></button>
+              <button class="btn btn-sm btn-success ms-2" onclick="exportarExcel()"><i class="fas fa-file-excel me-1"></i> Excel</button>
             </div>
           </div>
           <table class="table table-striped table-sm">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Voluntario</th>
-                <th>Tipo</th>
-                <th>Detalle</th>
-                <th>Monto</th>
-                <th>Método</th>
-              </tr>
-            </thead>
-            <tbody id="tablaHistorial">
-              </tbody>
+            <thead><tr><th>Fecha</th><th>RUT</th><th>Tipo</th><th>Detalle</th><th>Monto</th><th>Método</th></tr></thead>
+            <tbody id="tablaHistorial"></tbody>
           </table>
         </div>
       </div>
 
       <div class="tab-pane fade" id="content-admin">
-        <div class="row">
+        <div class="row g-4">
+          
           <div class="col-md-6">
-            <div class="table-container">
-              <h5 class="text-primary mb-3"><i class="fas fa-calendar-check me-2"></i>Generación Masiva de Cuotas</h5>
-              <p class="text-muted small">Genera la cuota ordinaria para TODOS los voluntarios activos.</p>
-              
+            <div class="table-container h-100">
+              <h5 class="text-primary mb-3"><i class="fas fa-users-cog me-2"></i>Generación Masiva</h5>
+              <p class="text-muted small">
+                Calcula automáticamente:
+                <br>• Cuota Normal vs Estudiante
+                <br>• Exención de Insignes
+                <br>• Descuentos por Guardia Nocturna
+              </p>
               <div class="row g-2 align-items-end">
                 <div class="col-6">
                   <label class="form-label">Mes</label>
                   <select id="mesMasivo" class="form-select">
-                    <option value="1">Enero</option>
-                    <option value="2">Febrero</option>
-                    <option value="3">Marzo</option>
-                    <option value="4">Abril</option>
-                    <option value="5">Mayo</option>
-                    <option value="6">Junio</option>
-                    <option value="7">Julio</option>
-                    <option value="8">Agosto</option>
-                    <option value="9">Septiembre</option>
-                    <option value="10">Octubre</option>
-                    <option value="11">Noviembre</option>
-                    <option value="12">Diciembre</option>
+                    <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+                    <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+                    <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+                    <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
                   </select>
                 </div>
                 <div class="col-6">
@@ -251,7 +208,7 @@
                 </div>
                 <div class="col-12 mt-3">
                   <button class="btn btn-primary w-100" onclick="ejecutarGeneracionMasiva()">
-                    <i class="fas fa-cogs me-2"></i> GENERAR CUOTAS
+                    GENERAR CUOTAS
                   </button>
                 </div>
               </div>
@@ -259,23 +216,56 @@
           </div>
 
           <div class="col-md-6">
-            <div class="table-container">
+            <div class="table-container h-100">
               <h5 class="text-danger mb-3"><i class="fas fa-ticket-alt me-2"></i>Cobro Extraordinario</h5>
-              <p class="text-muted small">Genera rifas, cuotas de mortuoria o bonos.</p>
-              
               <div class="mb-2">
                 <label class="form-label">Motivo</label>
-                <input type="text" id="motivoExtra" class="form-control" placeholder="Ej: Rifa Anual 2026">
+                <input type="text" id="motivoExtra" class="form-control" placeholder="Ej: Rifa Anual">
               </div>
               <div class="mb-3">
                 <label class="form-label">Monto</label>
                 <input type="number" id="montoExtra" class="form-control">
               </div>
               <button class="btn btn-danger w-100" onclick="generarCobroExtra()">
-                <i class="fas fa-plus-circle me-2"></i> ASIGNAR COBRO A TODOS
+                ASIGNAR A TODOS
               </button>
             </div>
           </div>
+
+          <div class="col-12">
+            <div class="table-container border-top border-3 border-secondary">
+              <h5 class="text-secondary mb-3"><i class="fas fa-user-edit me-2"></i>Generación Individual / Manual</h5>
+              <p class="text-muted small">Crea una cuota específica para un voluntario, ignorando reglas automáticas (Ideal para correcciones).</p>
+              
+              <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                  <label class="form-label">RUT Voluntario</label>
+                  <input type="text" id="rutIndiv" class="form-control" placeholder="12345678-K">
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Mes</label>
+                  <select id="mesIndiv" class="form-select">
+                    <option value="1">Ene</option><option value="2">Feb</option><option value="3">Mar</option>
+                    <option value="4">Abr</option><option value="5">May</option><option value="6">Jun</option>
+                    <option value="7">Jul</option><option value="8">Ago</option><option value="9">Sep</option>
+                    <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dic</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Año</label>
+                  <input type="number" id="anioIndiv" class="form-control" value="2026">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Monto Personalizado</label>
+                  <input type="number" id="montoIndiv" class="form-control" placeholder="$">
+                </div>
+                <div class="col-md-2">
+                  <button class="btn btn-secondary w-100" onclick="crearCuotaIndividual()">CREAR</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -283,237 +273,192 @@
   </div>
 
   <script>
-    // --- LÓGICA FRONTEND ---
-    // Variables de caché local para filtrado rápido
-    let datosDeudaCache = [];
-    let historialCache = [];
+    let cacheDeudas = [];
+    let cacheHistorial = []; // Para el Excel
 
-    // Al cargar la página
     document.addEventListener("DOMContentLoaded", function() {
-      cargarDatos();
+        const hoy = new Date();
+        // Setear selects al mes actual
+        document.getElementById('mesMasivo').value = hoy.getMonth() + 1;
+        document.getElementById('mesIndiv').value = hoy.getMonth() + 1;
+        
+        cargarDashboard();
+        cargarDeudas();
+        cargarHistorial();
     });
 
-    // 1. Cargar Datos Dashboard y Listas
-    async function cargarDatos() {
-      mostrarLoader();
-      try {
-        // Obtenemos Dashboard
-        const dash = await getDatosDashboard();
-        
-        // Render Dashboard
+    // --- DASHBOARD ---
+    async function cargarDashboard() {
+        const data = await getDatosDashboard();
         const fmt = (n) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(n);
-        document.getElementById('dashRecaudado').innerText = fmt(dash.recaudado);
-        document.getElementById('dashMeta').innerText = "Meta: " + fmt(dash.meta);
-        document.getElementById('dashMorosidad').innerText = dash.morosos;
-
-        // Barra Progreso
+        
+        document.getElementById('dashRecaudado').innerText = fmt(data.recaudado);
+        document.getElementById('dashMeta').innerText = "Meta: " + fmt(data.meta);
+        document.getElementById('dashMorosidad').innerText = data.morosos;
+        
         let porc = 0;
-        if(dash.meta > 0) porc = Math.min(100, Math.round((dash.recaudado / dash.meta) * 100));
+        if(data.meta > 0) porc = Math.min(100, (data.recaudado / data.meta) * 100);
         const barra = document.getElementById('barraMeta');
         barra.style.width = porc + "%";
-        barra.innerText = porc + "%";
-        
         if(porc < 50) barra.className = "progress-bar bg-danger";
         else if(porc < 80) barra.className = "progress-bar bg-warning";
         else barra.className = "progress-bar bg-success";
-
-        // Obtenemos Deudas (Reemplazo de getListaCobro de GAS)
-        await cargarDeudas();
-        
-        // Obtenemos Historial
-        await cargarHistorial();
-
-      } catch (e) {
-        console.error(e);
-        Swal.fire('Error', 'No se pudieron cargar los datos', 'error');
-      } finally {
-        ocultarLoader();
-      }
     }
 
+    // --- DEUDAS ---
     async function cargarDeudas() {
-      const lista = await getListaCobro();
-      datosDeudaCache = lista;
-      renderDeudas(lista);
+        mostrarLoader();
+        const lista = await getListaCobro();
+        ocultarLoader();
+        cacheDeudas = lista;
+        renderDeudas(lista);
     }
 
     function renderDeudas(lista) {
-      const tbody = document.getElementById('tablaDeudas');
-      tbody.innerHTML = "";
-      lista.forEach(d => {
-        const tr = document.createElement('tr');
-        const badgeClass = d.tipo === 'ORDINARIA' ? 'bg-ordinaria' : 'bg-extra';
-        const fmtMonto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(d.monto);
-        
-        tr.innerHTML = `
-          <td><div class="fw-bold">${d.nombre}</div><small class="text-muted">${d.rut}</small></td>
-          <td><span class="badge ${badgeClass} badge-pago">${d.tipo}</span></td>
-          <td>${d.detalle}</td>
-          <td class="fw-bold text-dark">${fmtMonto}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-success" onclick='seleccionarDeuda(${JSON.stringify(d)})'>
-              <i class="fas fa-hand-holding-usd"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+        const tb = document.getElementById('tablaDeudas');
+        tb.innerHTML = "";
+        lista.forEach(d => {
+            const tr = document.createElement('tr');
+            const fmtMonto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(d.monto);
+            const badge = d.tipo === 'ORDINARIA' ? 'bg-ordinaria' : 'bg-extra';
+            
+            tr.innerHTML = `
+                <td><b>${d.nombre}</b><br><small>${d.rut}</small></td>
+                <td><span class="badge ${badge} badge-pago">${d.tipo}</span></td>
+                <td>${d.detalle}</td>
+                <td class="fw-bold">${fmtMonto}</td>
+                <td><button class="btn btn-sm btn-outline-success" onclick='seleccionar(${JSON.stringify(d)})'><i class="fas fa-hand-holding-usd"></i></button></td>
+            `;
+            tb.appendChild(tr);
+        });
     }
 
-    // Filtrado en cliente (igual que tu original)
     function filtrarTablaDeudas() {
-      const q = document.getElementById('busqVoluntario').value.toUpperCase();
-      const filtrados = datosDeudaCache.filter(d => 
-        d.nombre.toUpperCase().includes(q) || d.rut.toUpperCase().includes(q)
-      );
-      renderDeudas(filtrados);
+        const q = document.getElementById('busqVoluntario').value.toUpperCase();
+        const filtrados = cacheDeudas.filter(d => d.nombre.toUpperCase().includes(q) || d.rut.includes(q));
+        renderDeudas(filtrados);
     }
 
-    // Selección de deuda para pagar
-    function seleccionarDeuda(d) {
-      document.getElementById('formPago').style.display = 'block';
-      document.getElementById('pagoIdDeuda').value = d.id;
-      document.getElementById('pagoTipoDeuda').value = d.tipo; 
-      document.getElementById('pagoNombre').value = d.nombre;
-      document.getElementById('pagoConcepto').value = d.tipo + " - " + d.detalle;
-      document.getElementById('pagoMonto').value = d.monto;
-      document.getElementById('pagoMonto').focus();
+    // --- PAGO ---
+    function seleccionar(d) {
+        document.getElementById('formPago').style.display = 'block';
+        document.getElementById('pagoIdDeuda').value = d.id;
+        document.getElementById('pagoOrigen').value = d.origen; // 'ordinaria' o 'extra'
+        document.getElementById('pagoRutVol').value = d.rut;
+        document.getElementById('pagoNombre').value = d.nombre;
+        document.getElementById('pagoConcepto').value = d.detalle;
+        document.getElementById('pagoMonto').value = d.monto;
+        document.getElementById('pagoMonto').focus();
     }
 
     function cancelarSeleccion() {
-      document.getElementById('formPago').reset();
-      document.getElementById('formPago').style.display = 'none';
+        document.getElementById('formPago').style.display = 'none';
     }
 
     async function confirmarPago() {
-      const id = document.getElementById('pagoIdDeuda').value;
-      const tipo = document.getElementById('pagoTipoDeuda').value;
-      const monto = document.getElementById('pagoMonto').value;
-      const metodo = document.getElementById('pagoMetodo').value;
-      const nombre = document.getElementById('pagoNombre').value;
+        const id = document.getElementById('pagoIdDeuda').value;
+        const origen = document.getElementById('pagoOrigen').value;
+        const rut = document.getElementById('pagoRutVol').value;
+        const concepto = document.getElementById('pagoConcepto').value;
+        const monto = document.getElementById('pagoMonto').value;
+        const metodo = document.getElementById('pagoMetodo').value;
 
-      if(!id || !monto) return Swal.fire("Error", "Seleccione una deuda primero", "warning");
+        if(!monto || monto <= 0) return Swal.fire("Error", "Monto inválido", "warning");
 
-      // Usamos el objeto "pago" tal cual lo hacías en GAS
-      const pago = { id, tipo, monto, metodo };
+        mostrarLoader();
+        const res = await registrarPago(id, origen, (origen==='ordinaria'?'ORDINARIA':'EXTRA'), monto, metodo, rut, concepto);
+        ocultarLoader();
 
-      Swal.fire({
-        title: '¿Registrar Pago?',
-        text: `Se registrará $${monto} para ${nombre}`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, Pagar'
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          mostrarLoader();
-          const res = await registrarPago(pago); // Llamada al backend JS
-          ocultarLoader();
-          
-          if (res.ok) {
-            Swal.fire("Éxito", "Pago registrado correctamente", "success");
+        if(res.ok) {
+            Swal.fire("Éxito", "Pago registrado", "success");
             cancelarSeleccion();
-            cargarDatos(); // Recargar todo
-          } else {
-            Swal.fire("Error", "No se pudo registrar el pago", "error");
-          }
+            cargarDashboard();
+            cargarDeudas();
+            cargarHistorial();
+        } else {
+            Swal.fire("Error", res.msg, "error");
         }
-      });
     }
 
-    // Historial
+    // --- HISTORIAL & EXCEL ---
     async function cargarHistorial() {
-       const lista = await getHistorialPagos();
-       historialCache = lista;
-       renderHistorial(lista);
-    }
-
-    function renderHistorial(lista) {
-      const tbody = document.getElementById('tablaHistorial');
-      tbody.innerHTML = "";
-      lista.forEach(p => {
-        const tr = document.createElement('tr');
-        // Fecha formateada igual que en GAS
-        const fecha = new Date(p.fecha_registro).toLocaleDateString();
-        const fmtMonto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(p.monto_pagado);
-        
-        tr.innerHTML = `
-          <td>${fecha}</td>
-          <td>${p.rut}</td>
-          <td>${p.tipo}</td>
-          <td>${p.mes}</td> <td>${fmtMonto}</td>
-          <td>${p.metodo}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function filtrarHistorial() {
-      const q = document.getElementById('filtroHistorial').value.toUpperCase();
-      const filtrados = historialCache.filter(p => 
-        String(p.rut).toUpperCase().includes(q) || String(p.tipo).toUpperCase().includes(q)
-      );
-      renderHistorial(filtrados);
+        const lista = await getHistorialPagos();
+        cacheHistorial = lista; // Guardar para Excel
+        const tb = document.getElementById('tablaHistorial');
+        tb.innerHTML = "";
+        lista.forEach(p => {
+            const fmt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(p.monto);
+            tb.innerHTML += `<tr><td>${p.fecha}</td><td>${p.rut}</td><td>${p.tipo}</td><td>${p.detalle}</td><td>${fmt}</td><td>${p.metodo}</td></tr>`;
+        });
     }
 
     function exportarExcel() {
-      let csvContent = "data:text/csv;charset=utf-8,Fecha;RUT;Tipo;Detalle;Monto\n";
-      historialCache.forEach(d => {
-         const fecha = new Date(d.fecha_registro).toLocaleDateString();
-         csvContent += `${fecha};${d.rut};${d.tipo};${d.mes};${d.monto_pagado}\n`;
-      });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "historial_pagos.csv");
-      document.body.appendChild(link);
-      link.click();
+        if(!cacheHistorial || cacheHistorial.length === 0) return Swal.fire("Aviso", "No hay datos para exportar", "info");
+        
+        let csv = "Fecha;RUT;Tipo;Detalle;Monto;Metodo\n";
+        cacheHistorial.forEach(Row => {
+            csv += `${Row.fecha};${Row.rut};${Row.tipo};${Row.detalle};${Row.monto};${Row.metodo}\n`;
+        });
+
+        const bom = "\uFEFF"; // Para que Excel reconozca tildes
+        const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "historial_pagos.csv";
+        link.click();
     }
 
-    // Administración
+    // --- ADMIN (MASIVO & INDIVIDUAL) ---
     async function ejecutarGeneracionMasiva() {
-      const anio = document.getElementById('anioMasivo').value;
-      const mes = document.getElementById('mesMasivo').value;
-      
-      if(!confirm(`¿Desea generar las cuotas de TODOS los voluntarios para el mes ${mes} del año ${anio}?`)) return;
-      
-      mostrarLoader();
-      const res = await generarCuotasMasivas(anio, mes);
-      ocultarLoader();
-      
-      if(res.ok) {
-        Swal.fire("Proceso Terminado", `Se generaron ${res.cantidad} cuotas nuevas.`, "success");
-        cargarDeudas();
-      } else {
-        Swal.fire("Error", res.msg, "error");
-      }
+        const m = document.getElementById('mesMasivo').value;
+        const a = document.getElementById('anioMasivo').value;
+        if(!confirm(`⚠️ PROCESO CRÍTICO\n\nSe generarán las cuotas para ${m}/${a} aplicando:\n- Descuentos por Guardia\n- Tarifas Estudiante\n- Exención Insignes\n\n¿Proceder?`)) return;
+
+        mostrarLoader();
+        const res = await generarCuotasMasivas(a, m);
+        ocultarLoader();
+
+        if(res.ok) Swal.fire("Finalizado", res.msg, "success");
+        else Swal.fire("Error", res.msg, "error");
     }
 
     async function generarCobroExtra() {
-      const motivo = document.getElementById('motivoExtra').value;
-      const monto = document.getElementById('montoExtra').value;
-      
-      if(!motivo || !monto) return Swal.fire("Atención", "Complete motivo y monto", "warning");
-      if(!confirm(`¿Generar cobro de $${monto} por '${motivo}' a TODOS los voluntarios?`)) return;
-      
-      mostrarLoader();
-      const res = await generarCobroExtraMasivo(motivo, monto);
-      ocultarLoader();
-      
-      if(res.ok) {
-        Swal.fire("Éxito", `Se asignó el cobro a ${res.cantidad} voluntarios.`, "success");
-        cargarDeudas();
-      } else {
-        Swal.fire("Error", res.msg, "error");
-      }
+        const mot = document.getElementById('motivoExtra').value;
+        const mon = document.getElementById('montoExtra').value;
+        if(!mot || !mon) return Swal.fire("Datos incompletos");
+        if(!confirm(`¿Generar cobro de $${mon} por "${mot}" a TODOS los voluntarios activos?`)) return;
+
+        mostrarLoader();
+        const res = await generarCobroExtraMasivo(mot, mon);
+        ocultarLoader();
+        if(res.ok) Swal.fire("Listo", `Se generaron ${res.count} cobros extras.`, "success");
+        else Swal.fire("Error", res.msg, "error");
     }
 
-    // --- HELPERS ---
-    function normalizarRut(rut) {
-      if (!rut) return "";
-      return String(rut).toUpperCase().replace(/[^0-9K]/g, "");
+    async function crearCuotaIndividual() {
+        const rut = document.getElementById('rutIndiv').value;
+        const mes = document.getElementById('mesIndiv').value;
+        const anio = document.getElementById('anioIndiv').value;
+        const monto = document.getElementById('montoIndiv').value;
+
+        if(!rut || !monto) return Swal.fire("Atención", "Ingrese RUT y Monto", "warning");
+
+        mostrarLoader();
+        // Llamada a la función del backend que creamos para esto
+        const res = await generarCuotaIndividual(rut, anio, mes, monto);
+        ocultarLoader();
+
+        if(res.ok) {
+            Swal.fire("Éxito", "Cuota individual creada.", "success");
+            cargarDeudas(); // Refrescar lista para verla
+        } else {
+            Swal.fire("Error", res.msg, "error");
+        }
     }
+
     function mostrarLoader() { document.getElementById('loader').style.display = 'block'; }
     function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
   </script>
 </body>
+</html>
 </html>
