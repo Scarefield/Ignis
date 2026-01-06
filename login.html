@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ignis - Login</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script> <script src="js/utils.js"></script>    <script src="js/auth.js"></script>     <style>
+    /* TUS ESTILOS EXACTOS */
+    body { 
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                  url('https://images.unsplash.com/photo-1516533075015-a3838414c3ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80'); 
+      background-size: cover;
+      background-position: center;
+      height: 100vh; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 40px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+
+    .ignis-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      color: #fff;
+      font-size: 2.5rem;
+      margin-bottom: 5px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .ignis-subtitle {
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
+    .form-control, .form-select {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background: rgba(0, 0, 0, 0.7);
+      border-color: #ff6b6b;
+      color: white;
+      box-shadow: none;
+    }
+
+    .btn-login {
+      background: #b71c1c;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .btn-login:hover {
+      background: #d32f2f;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(183, 28, 28, 0.4);
+    }
+
+    .input-icon { position: relative; }
+    .input-icon i {
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      color: #aaa;
+    }
+    .input-icon input, .input-icon select { padding-left: 40px; }
+
+    ::placeholder { color: #ccc; }
+  </style>
+</head>
+<body>
+
+  <div class="login-card animate__animated animate__fadeIn">
+    <div class="ignis-title">Ignis</div>
+    <div class="ignis-subtitle">Acceso Unificado</div>
+
+    <div class="input-icon">
+      <i class="fas fa-user-tag"></i>
+      <select id="rol" class="form-select">
+        <option value="" selected disabled>Seleccione Rol</option>
+        <option value="voluntario">Voluntario</option>
+        <option value="maquinista">Maquinista</option>
+        <option value="conductor">Conductor (Rentado)</option>
+        <option value="teniente">Teniente</option>
+        <option value="capitan">Capitán</option>
+        <option value="ayudante">Ayudante</option>
+        <option value="secretario">Secretario</option>
+        <option value="tesorero">Tesorero</option>
+        <option value="jefe_guardia">Jefe de Guardia</option>
+      </select>
+    </div>
+
+    <div class="input-icon">
+      <i class="fas fa-id-card"></i>
+      <input type="text" id="rut" class="form-control" placeholder="RUT (12345678-9)">
+    </div>
+
+    <div class="input-icon">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="clave" class="form-control" placeholder="Contraseña">
+    </div>
+
+    <button class="btn-login" id="btnIngresar" onclick="iniciarSesionSistema()">
+      INGRESAR
+    </button>
+    
+    <div class="mt-3">
+      <small><a href="#" class="text-white-50 text-decoration-none">¿Olvidó su clave?</a></small>
+    </div>
+  </div>
+
+  <script>
+    // Función wrapper que conecta el HTML con tu lógica en JS/auth.js
+    function iniciarSesionSistema() {
+      const btn = document.getElementById('btnIngresar');
+      const rut = document.getElementById('rut').value;
+      const rol = document.getElementById('rol').value;
+      const clave = document.getElementById('clave').value;
+
+      if (!rut) return Swal.fire('Acceso Denegado', 'Debe ingresar su RUT reglamentario', 'warning');
+      if (!rol) return Swal.fire('Acceso Denegado', 'Debe seleccionar un Rol', 'warning');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>VERIFICANDO...';
+
+      // Llamamos a la función Login que está en js/auth.js (reemplaza a google.script.run)
+      autenticarUsuario(rol, rut, clave).then(res => {
+        
+        if (res.ok) {
+            // Éxito: Redirigimos
+            // La URL de destino se construye basada en el 'page' que nos devuelve la lógica
+            // Ejemplo: dashboard.html?page=voluntario_home&rut=...
+            const destino = `dashboard.html?page=${res.page}&rut=${encodeURIComponent(rut)}&nombre=${encodeURIComponent(res.nombre)}&rol=${res.rol}`;
+            
+            Swal.fire({
+              title: '¡Acceso Autorizado!',
+              text: `Bienvenido(a), ${res.nombre}`,
+              icon: 'success',
+              confirmButtonText: 'ABRIR PANEL',
+              confirmButtonColor: '#198754',
+              allowOutsideClick: false,
+              showClass: { popup: 'animate__animated animate__zoomIn' }
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = destino;
+              }
+            });
+
+        } else {
+          // Error
+          Swal.fire('Error de Autenticación', res.msg, 'error');
+          btn.disabled = false;
+          btn.innerHTML = 'INGRESAR';
+        }
+
+      }).catch(err => {
+        console.error(err);
+        Swal.fire('Error del Sistema', 'No se pudo conectar con la base de datos.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'INGRESAR';
+      });
+    }
+  </script>
+</body>
+</html>
