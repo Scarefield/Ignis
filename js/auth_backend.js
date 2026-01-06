@@ -1,11 +1,13 @@
 /**
  * auth_backend.js - Lógica de Autenticación
+ * Reemplaza a Auth.gs
  */
 
 async function login(rolSolicitado, rut, clave) {
+    // 1. Normalizar RUT
     const rBusq = normalizarRut(rut);
 
-    // --- 1. LÓGICA DE CONDUCTORES ---
+    // 2. Lógica para CONDUCTORES (Sin clave, tabla separada)
     if (rolSolicitado === 'conductor') {
         const { data: conductor, error } = await clienteSupabase
             .from('conductores')
@@ -26,7 +28,7 @@ async function login(rolSolicitado, rut, clave) {
         };
     }
 
-    // --- 2. LÓGICA DE VOLUNTARIOS Y OFICIALES ---
+    // 3. Lógica para VOLUNTARIOS Y OFICIALES
     const { data: voluntario, error } = await clienteSupabase
         .from('voluntarios')
         .select('*')
@@ -37,18 +39,21 @@ async function login(rolSolicitado, rut, clave) {
         return { ok: false, msg: "Usuario no encontrado en registros." };
     }
 
+    // Validar estado (ACTIVO o SI)
     if (voluntario.estado !== 'ACTIVO' && voluntario.estado !== 'SI') {
         return { ok: false, msg: "Usuario inactivo o suspendido." };
     }
 
+    // Validar contraseña
     if (String(voluntario.clave) !== String(clave)) {
         return { ok: false, msg: "Contraseña incorrecta." };
     }
 
+    // Validar Roles Específicos
     const rolReal = String(voluntario.rol || '').toLowerCase().trim();
     const rolSol = rolSolicitado.toLowerCase().trim();
 
-    // LÓGICA DE TENIENTES
+    // Caso Teniente (Validación especial de rango)
     if (rolSol === 'teniente') {
         if (rolReal.includes('teniente')) {
              return { ok: true, page: 'teniente_dashboard', nombre: voluntario.nombre, rol: voluntario.rol, rut: rBusq };
@@ -57,12 +62,12 @@ async function login(rolSolicitado, rut, clave) {
         }
     }
 
-    // LÓGICA RESTO DE OFICIALES
+    // Caso Otros Oficiales (El rol debe coincidir)
     if (rolSol !== 'voluntario' && rolReal !== rolSol) {
         return { ok: false, msg: "No tienes permisos de " + rolSolicitado };
     }
 
-    // MAPA DE DESTINOS
+    // 4. Mapa de Redirección (Igual a Auth.gs)
     const destinos = {
         'capitan': 'capitan_dashboard',
         'tesorero': 'tesoreria',
@@ -75,6 +80,7 @@ async function login(rolSolicitado, rut, clave) {
 
     let paginaDestino = destinos[rolSol] || 'index';
 
+    // Retorno final de éxito
     return { 
         ok: true, 
         page: paginaDestino, 
@@ -82,8 +88,8 @@ async function login(rolSolicitado, rut, clave) {
         rol: voluntario.rol, 
         rut: rBusq 
     };
-} 
-// <--- ASEGÚRATE DE QUE ESTA LLAVE FINAL EXISTA
+
+} // <--- ESTA LLAVE CIERRA LA FUNCIÓN PRINCIPAL. ES VITAL.
   if (rolSol === 'voluntario') pageDestino = 'voluntario_home'; 
 
   return { ok: true, page: pageDestino, nombre: v.nombre, rol: v.rol, rut: rBusq };
