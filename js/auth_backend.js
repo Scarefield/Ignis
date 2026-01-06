@@ -1,6 +1,6 @@
 /**
- * auth_backend.js - Lógica de Autenticación
- * Reemplaza a Auth.gs
+ * auth_backend.js
+ * Lógica de Autenticación conectada a Supabase.
  */
 
 async function login(rolSolicitado, rut, clave) {
@@ -39,7 +39,7 @@ async function login(rolSolicitado, rut, clave) {
         return { ok: false, msg: "Usuario no encontrado en registros." };
     }
 
-    // Validar estado (ACTIVO o SI)
+    // Validar estado
     if (voluntario.estado !== 'ACTIVO' && voluntario.estado !== 'SI') {
         return { ok: false, msg: "Usuario inactivo o suspendido." };
     }
@@ -49,11 +49,11 @@ async function login(rolSolicitado, rut, clave) {
         return { ok: false, msg: "Contraseña incorrecta." };
     }
 
-    // Validar Roles Específicos
+    // Validar Roles
     const rolReal = String(voluntario.rol || '').toLowerCase().trim();
     const rolSol = rolSolicitado.toLowerCase().trim();
 
-    // Caso Teniente (Validación especial de rango)
+    // Caso Teniente
     if (rolSol === 'teniente') {
         if (rolReal.includes('teniente')) {
              return { ok: true, page: 'teniente_dashboard', nombre: voluntario.nombre, rol: voluntario.rol, rut: rBusq };
@@ -62,12 +62,12 @@ async function login(rolSolicitado, rut, clave) {
         }
     }
 
-    // Caso Otros Oficiales (El rol debe coincidir)
+    // Caso Otros Oficiales
     if (rolSol !== 'voluntario' && rolReal !== rolSol) {
         return { ok: false, msg: "No tienes permisos de " + rolSolicitado };
     }
 
-    // 4. Mapa de Redirección (Igual a Auth.gs)
+    // Mapa de Destinos
     const destinos = {
         'capitan': 'capitan_dashboard',
         'tesorero': 'tesoreria',
@@ -80,7 +80,6 @@ async function login(rolSolicitado, rut, clave) {
 
     let paginaDestino = destinos[rolSol] || 'index';
 
-    // Retorno final de éxito
     return { 
         ok: true, 
         page: paginaDestino, 
@@ -88,9 +87,4 @@ async function login(rolSolicitado, rut, clave) {
         rol: voluntario.rol, 
         rut: rBusq 
     };
-
-} // <--- ESTA LLAVE CIERRA LA FUNCIÓN PRINCIPAL. ES VITAL.
-  if (rolSol === 'voluntario') pageDestino = 'voluntario_home'; 
-
-  return { ok: true, page: pageDestino, nombre: v.nombre, rol: v.rol, rut: rBusq };
 }
