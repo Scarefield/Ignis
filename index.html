@@ -190,18 +190,29 @@
             const urlDestino = DIRECTORIO[cuerpo][cia];
             
             if (urlDestino) {
-                // Animación de salida antes de redirigir
+                // Animación de carga
                 Swal.fire({
-                    title: 'Conectando...',
-                    text: 'Redirigiendo al sistema seguro',
-                    timer: 1500,
+                    title: 'Iniciando Sistema Ignis',
+                    text: 'Estableciendo conexión segura...',
+                    timer: 1000,
                     timerProgressBar: true,
                     showConfirmButton: false,
+                    background: '#1e272e', // Color oscuro acorde a tu tema
+                    color: '#fff',
                     didOpen: () => {
                         Swal.showLoading();
                     }
                 }).then(() => {
-                    window.location.href = urlDestino;
+                    // AQUÍ ESTÁ EL TRUCO:
+                    // En lugar de irse (window.location), borramos el portal
+                    // y creamos un iframe que ocupe el 100% de la pantalla
+                    
+                    document.body.innerHTML = `
+                        <iframe src="${urlDestino}" 
+                                style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999; background-color: #1e272e;"
+                                allow="geolocation; microphone; camera; fullscreen">
+                        </iframe>
+                    `;
                 });
             } else {
                 Swal.fire('Error', 'Sistema no disponible para esta compañía aún.', 'warning');
