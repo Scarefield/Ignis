@@ -10,7 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* TUS ESTILOS ORIGINALES INTACTOS */
         body {
             background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
                         url('https://images.unsplash.com/photo-1516533075015-a3838414c3ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80');
@@ -23,6 +22,7 @@
             font-family: 'Poppins', sans-serif;
             color: white;
         }
+
         .portal-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
@@ -34,6 +34,8 @@
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
+
+        /* LOGO IGNIS */
         .ignis-logo-svg {
             width: 90px;
             height: 90px;
@@ -41,11 +43,13 @@
             animation: burn 3s infinite ease-in-out;
             filter: drop-shadow(0 0 15px rgba(220, 20, 60, 0.6));
         }
+        
         @keyframes burn {
             0% { transform: scale(1) translateY(0); opacity: 0.9; }
             50% { transform: scale(0.95) translateY(2px); opacity: 0.8; }
             100% { transform: scale(1) translateY(0); opacity: 0.9; }
         }
+
         .ignis-text {
             font-family: 'Cinzel', serif;
             font-weight: 700;
@@ -55,6 +59,7 @@
             margin-bottom: 5px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
+
         .ignis-slogan {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -63,6 +68,8 @@
             font-weight: 600;
             margin-bottom: 30px;
         }
+
+        /* FORMULARIOS */
         .form-select {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -72,16 +79,19 @@
             margin-bottom: 15px;
             font-size: 1rem;
         }
+        
         .form-select:focus {
             background: rgba(255, 255, 255, 0.2);
             border-color: #ff4757;
             box-shadow: none;
             color: white;
         }
+        
         .form-select option {
             background: #1e272e;
             color: white;
         }
+
         .btn-go {
             background: linear-gradient(45deg, #ff4757, #ff6b81);
             border: none;
@@ -95,6 +105,7 @@
             margin-top: 10px;
             transition: all 0.3s;
         }
+
         .btn-go:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(255, 71, 87, 0.4);
@@ -118,7 +129,7 @@
         <select id="cuerpo" class="form-select" onchange="cargarCompanias()">
             <option value="" selected disabled>Seleccione Cuerpo de Bomberos</option>
             <option value="san_bernardo">CB San Bernardo</option>
-        </select>
+            </select>
 
         <select id="compania" class="form-select" disabled>
             <option value="" selected disabled>Seleccione Compañía</option>
@@ -134,26 +145,13 @@
     </div>
 
     <script>
-        // === CONFIGURACIÓN DE RUTAS ===
-        // Ahora todos redirigen a 'login.html' enviando los parametros por URL
-        const LOGIN_URL = "login.html";
-
+        // === CONFIGURACIÓN DE LINKS ===
+        // Aquí pegas los links largos de Google Apps Script de cada compañía
         const DIRECTORIO = {
             "san_bernardo": {
-                // Aquí podrías tener configuraciones específicas por compañía si quisieras
-                // Pero todas van al mismo login unificado
-                "1": { url: LOGIN_URL },
-                "2": { url: LOGIN_URL },
-                "3": { url: LOGIN_URL },
-                "4": { url: LOGIN_URL },
-                "5": { url: LOGIN_URL },
-                "6": { url: LOGIN_URL },
-                "7": { url: LOGIN_URL },
-                "8": { url: LOGIN_URL },
-                "10": { url: LOGIN_URL },
-                "11": { url: LOGIN_URL },
-                "12": { url: LOGIN_URL }
-            }
+                "1": "https://script.google.com/macros/s/AKfycbwjx93gLFIa5bKWf18_ggOygKgohqrlrbT-Kq4ICZNWZARs59kz62bjR3w2OeZ1R--G/exec",
+                
+            },
         };
 
         function cargarCompanias() {
@@ -189,12 +187,10 @@
                 return;
             }
 
-            // Construimos la URL con parámetros: login.html?cuerpo=san_bernardo&cia=1
-            const destinoData = DIRECTORIO[cuerpo][cia];
+            const urlDestino = DIRECTORIO[cuerpo][cia];
             
-            if (destinoData) {
-                const urlFinal = `${destinoData.url}?cuerpo=${cuerpo}&cia=${cia}`;
-
+            if (urlDestino) {
+                // Animación de salida antes de redirigir
                 Swal.fire({
                     title: 'Conectando...',
                     text: 'Redirigiendo al sistema seguro',
@@ -205,7 +201,7 @@
                         Swal.showLoading();
                     }
                 }).then(() => {
-                    window.location.href = urlFinal;
+                    window.location.href = urlDestino;
                 });
             } else {
                 Swal.fire('Error', 'Sistema no disponible para esta compañía aún.', 'warning');
