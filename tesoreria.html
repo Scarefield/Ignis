@@ -1,10 +1,6 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tesorería - Ignis</title>
-  
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,7 +11,6 @@
   <script src="js/supabase.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/tesoreria_backend.js"></script> <style>
-    /* TUS ESTILOS EXACTOS */
     :root {
       --primary: #0d47a1; --secondary: #546e7a; 
       --success: #2e7d32; --warning: #f9a825; --danger: #c62828;
@@ -288,232 +283,237 @@
   </div>
 
   <script>
-    // Variables globales para la tabla filtrable
+    // --- LÓGICA FRONTEND ---
+    // Variables de caché local para filtrado rápido
     let datosDeudaCache = [];
     let historialCache = [];
 
-    document.addEventListener("DOMContentLoaded", async function() {
-        mostrarLoader();
-        try {
-            // 1. Cargar Dashboard
-            const dash = await getDatosDashboard();
-            
-            // Formatear dinero
-            const fmt = (n) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(n);
-            
-            document.getElementById('dashRecaudado').innerText = fmt(dash.recaudado);
-            document.getElementById('dashMeta').innerText = "Meta: " + fmt(dash.meta);
-            
-            // Barra de progreso
-            let porc = 0;
-            if(dash.meta > 0) porc = Math.min(100, Math.round((dash.recaudado / dash.meta) * 100));
-            
-            const barra = document.getElementById('barraMeta');
-            barra.style.width = porc + "%";
-            barra.innerText = porc + "%";
-            if(porc < 50) barra.className = "progress-bar bg-danger";
-            else if(porc < 80) barra.className = "progress-bar bg-warning";
-            else barra.className = "progress-bar bg-success";
-
-            document.getElementById('dashMorosidad').innerText = dash.morosos;
-
-            // 2. Cargar Deudas
-            await cargarDeudas();
-
-            // 3. Cargar Historial
-            await cargarHistorial();
-
-        } catch (e) {
-            console.error(e);
-            Swal.fire("Error", "No se pudieron cargar los datos iniciales.", "error");
-        } finally {
-            ocultarLoader();
-        }
+    // Al cargar la página
+    document.addEventListener("DOMContentLoaded", function() {
+      cargarDatos();
     });
 
+    // 1. Cargar Datos Dashboard y Listas
+    async function cargarDatos() {
+      mostrarLoader();
+      try {
+        // Obtenemos Dashboard
+        const dash = await getDatosDashboard();
+        
+        // Render Dashboard
+        const fmt = (n) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(n);
+        document.getElementById('dashRecaudado').innerText = fmt(dash.recaudado);
+        document.getElementById('dashMeta').innerText = "Meta: " + fmt(dash.meta);
+        document.getElementById('dashMorosidad').innerText = dash.morosos;
+
+        // Barra Progreso
+        let porc = 0;
+        if(dash.meta > 0) porc = Math.min(100, Math.round((dash.recaudado / dash.meta) * 100));
+        const barra = document.getElementById('barraMeta');
+        barra.style.width = porc + "%";
+        barra.innerText = porc + "%";
+        
+        if(porc < 50) barra.className = "progress-bar bg-danger";
+        else if(porc < 80) barra.className = "progress-bar bg-warning";
+        else barra.className = "progress-bar bg-success";
+
+        // Obtenemos Deudas (Reemplazo de getListaCobro de GAS)
+        await cargarDeudas();
+        
+        // Obtenemos Historial
+        await cargarHistorial();
+
+      } catch (e) {
+        console.error(e);
+        Swal.fire('Error', 'No se pudieron cargar los datos', 'error');
+      } finally {
+        ocultarLoader();
+      }
+    }
+
     async function cargarDeudas() {
-        const lista = await getListaCobro();
-        datosDeudaCache = lista;
-        renderDeudas(lista);
+      const lista = await getListaCobro();
+      datosDeudaCache = lista;
+      renderDeudas(lista);
     }
 
     function renderDeudas(lista) {
-        const tbody = document.getElementById('tablaDeudas');
-        tbody.innerHTML = "";
+      const tbody = document.getElementById('tablaDeudas');
+      tbody.innerHTML = "";
+      lista.forEach(d => {
+        const tr = document.createElement('tr');
+        const badgeClass = d.tipo === 'ORDINARIA' ? 'bg-ordinaria' : 'bg-extra';
+        const fmtMonto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(d.monto);
         
-        lista.forEach(d => {
-            const tr = document.createElement('tr');
-            const badgeClass = d.tipo === 'ORDINARIA' ? 'bg-ordinaria' : 'bg-extra';
-            const fmtMonto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(d.monto);
-            
-            tr.innerHTML = `
-                <td><div class="fw-bold">${d.nombre}</div><small class="text-muted">${d.rut}</small></td>
-                <td><span class="badge ${badgeClass} badge-pago">${d.tipo}</span></td>
-                <td>${d.detalle}</td>
-                <td class="fw-bold text-dark">${fmtMonto}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-success" onclick='seleccionarDeuda(${JSON.stringify(d)})'>
-                        <i class="fas fa-hand-holding-usd"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        tr.innerHTML = `
+          <td><div class="fw-bold">${d.nombre}</div><small class="text-muted">${d.rut}</small></td>
+          <td><span class="badge ${badgeClass} badge-pago">${d.tipo}</span></td>
+          <td>${d.detalle}</td>
+          <td class="fw-bold text-dark">${fmtMonto}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-success" onclick='seleccionarDeuda(${JSON.stringify(d)})'>
+              <i class="fas fa-hand-holding-usd"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
+    // Filtrado en cliente (igual que tu original)
+    function filtrarTablaDeudas() {
+      const q = document.getElementById('busqVoluntario').value.toUpperCase();
+      const filtrados = datosDeudaCache.filter(d => 
+        d.nombre.toUpperCase().includes(q) || d.rut.toUpperCase().includes(q)
+      );
+      renderDeudas(filtrados);
+    }
+
+    // Selección de deuda para pagar
     function seleccionarDeuda(d) {
-        document.getElementById('formPago').style.display = 'block';
-        document.getElementById('pagoIdDeuda').value = d.id;
-        document.getElementById('pagoTipoDeuda').value = d.tipo; // ORDINARIA o EXTRA
-        document.getElementById('pagoNombre').value = d.nombre;
-        document.getElementById('pagoConcepto').value = d.tipo + " - " + d.detalle;
-        document.getElementById('pagoMonto').value = d.monto;
-        document.getElementById('pagoMonto').focus();
+      document.getElementById('formPago').style.display = 'block';
+      document.getElementById('pagoIdDeuda').value = d.id;
+      document.getElementById('pagoTipoDeuda').value = d.tipo; 
+      document.getElementById('pagoNombre').value = d.nombre;
+      document.getElementById('pagoConcepto').value = d.tipo + " - " + d.detalle;
+      document.getElementById('pagoMonto').value = d.monto;
+      document.getElementById('pagoMonto').focus();
     }
 
     function cancelarSeleccion() {
-        document.getElementById('formPago').reset();
-        document.getElementById('formPago').style.display = 'none';
+      document.getElementById('formPago').reset();
+      document.getElementById('formPago').style.display = 'none';
     }
 
     async function confirmarPago() {
-        const id = document.getElementById('pagoIdDeuda').value;
-        const tipo = document.getElementById('pagoTipoDeuda').value;
-        const monto = document.getElementById('pagoMonto').value;
-        const metodo = document.getElementById('pagoMetodo').value;
-        const nombre = document.getElementById('pagoNombre').value;
+      const id = document.getElementById('pagoIdDeuda').value;
+      const tipo = document.getElementById('pagoTipoDeuda').value;
+      const monto = document.getElementById('pagoMonto').value;
+      const metodo = document.getElementById('pagoMetodo').value;
+      const nombre = document.getElementById('pagoNombre').value;
 
-        if(!id || !monto) return Swal.fire("Error", "Seleccione una deuda primero", "warning");
+      if(!id || !monto) return Swal.fire("Error", "Seleccione una deuda primero", "warning");
 
-        const confirmacion = await Swal.fire({
-            title: '¿Registrar Pago?',
-            text: `Se registrará $${monto} para ${nombre}`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, Pagar'
-        });
+      // Usamos el objeto "pago" tal cual lo hacías en GAS
+      const pago = { id, tipo, monto, metodo };
 
-        if (confirmacion.isConfirmed) {
-            mostrarLoader();
-            const res = await registrarPago({ id, tipo, monto, metodo });
-            ocultarLoader();
-            
-            if (res.ok) {
-                Swal.fire("Éxito", "Pago registrado correctamente", "success");
-                cancelarSeleccion();
-                cargarDeudas(); // Recargar lista
-                cargarHistorial(); // Recargar historial
-                // Actualizar dashboard (simple reload de parte o toda la pag)
-                getDatosDashboard().then(dash => {
-                   document.getElementById('dashRecaudado').innerText = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(dash.recaudado);
-                });
-            } else {
-                Swal.fire("Error", "No se pudo registrar el pago: " + res.msg, "error");
-            }
+      Swal.fire({
+        title: '¿Registrar Pago?',
+        text: `Se registrará $${monto} para ${nombre}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, Pagar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          mostrarLoader();
+          const res = await registrarPago(pago); // Llamada al backend JS
+          ocultarLoader();
+          
+          if (res.ok) {
+            Swal.fire("Éxito", "Pago registrado correctamente", "success");
+            cancelarSeleccion();
+            cargarDatos(); // Recargar todo
+          } else {
+            Swal.fire("Error", "No se pudo registrar el pago", "error");
+          }
         }
+      });
     }
 
-    // --- FILTRADO EN CLIENTE (Para mantener la velocidad de GAS) ---
-    function filtrarTablaDeudas() {
-        const q = document.getElementById('busqVoluntario').value.toUpperCase();
-        const filtrados = datosDeudaCache.filter(d => 
-            d.nombre.toUpperCase().includes(q) || 
-            d.rut.toUpperCase().includes(q)
-        );
-        renderDeudas(filtrados);
-    }
-
-    // --- HISTORIAL ---
+    // Historial
     async function cargarHistorial() {
-        const lista = await getHistorialPagos();
-        historialCache = lista;
-        renderHistorial(lista);
+       const lista = await getHistorialPagos();
+       historialCache = lista;
+       renderHistorial(lista);
     }
 
     function renderHistorial(lista) {
-        const tbody = document.getElementById('tablaHistorial');
-        tbody.innerHTML = "";
-        lista.forEach(p => {
-            const tr = document.createElement('tr');
-            const fecha = new Date(p.fecha_registro).toLocaleDateString();
-            const fmtMonto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(p.monto_pagado);
-            tr.innerHTML = `
-                <td>${fecha}</td>
-                <td>${p.rut}</td> <td>${p.tipo}</td>
-                <td>${p.mes}</td>
-                <td>${fmtMonto}</td>
-                <td>${p.metodo}</td>
-            `;
-            tbody.appendChild(tr);
-        });
+      const tbody = document.getElementById('tablaHistorial');
+      tbody.innerHTML = "";
+      lista.forEach(p => {
+        const tr = document.createElement('tr');
+        // Fecha formateada igual que en GAS
+        const fecha = new Date(p.fecha_registro).toLocaleDateString();
+        const fmtMonto = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(p.monto_pagado);
+        
+        tr.innerHTML = `
+          <td>${fecha}</td>
+          <td>${p.rut}</td>
+          <td>${p.tipo}</td>
+          <td>${p.mes}</td> <td>${fmtMonto}</td>
+          <td>${p.metodo}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
     function filtrarHistorial() {
-        const q = document.getElementById('filtroHistorial').value.toUpperCase();
-        const filtrados = historialCache.filter(p => 
-            String(p.rut).toUpperCase().includes(q) || 
-            String(p.tipo).toUpperCase().includes(q) ||
-            String(p.mes).toUpperCase().includes(q)
-        );
-        renderHistorial(filtrados);
+      const q = document.getElementById('filtroHistorial').value.toUpperCase();
+      const filtrados = historialCache.filter(p => 
+        String(p.rut).toUpperCase().includes(q) || String(p.tipo).toUpperCase().includes(q)
+      );
+      renderHistorial(filtrados);
     }
 
     function exportarExcel() {
-        let csvContent = "data:text/csv;charset=utf-8,Fecha,RUT,Tipo,Detalle,Monto,Metodo\n";
-        historialCache.forEach(p => {
-             const fecha = new Date(p.fecha_registro).toLocaleDateString();
-             csvContent += `${fecha},${p.rut},${p.tipo},${p.mes},${p.monto_pagado},${p.metodo}\n`;
-        });
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "historial_pagos.csv");
-        document.body.appendChild(link);
-        link.click();
+      let csvContent = "data:text/csv;charset=utf-8,Fecha;RUT;Tipo;Detalle;Monto\n";
+      historialCache.forEach(d => {
+         const fecha = new Date(d.fecha_registro).toLocaleDateString();
+         csvContent += `${fecha};${d.rut};${d.tipo};${d.mes};${d.monto_pagado}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "historial_pagos.csv");
+      document.body.appendChild(link);
+      link.click();
     }
 
-    // --- ADMIN ---
+    // Administración
     async function ejecutarGeneracionMasiva() {
-        const anio = document.getElementById('anioMasivo').value;
-        const mes = document.getElementById('mesMasivo').value;
-
-        if(!confirm(`¿Desea generar las cuotas de TODOS los voluntarios para el mes ${mes} del año ${anio}?`)) return;
-
-        mostrarLoader();
-        const res = await generarCuotasMasivas(anio, mes);
-        ocultarLoader();
-
-        if(res.ok) {
-            Swal.fire("Proceso Terminado", `Se generaron ${res.cantidad} cuotas nuevas.`, "success");
-            cargarDeudas();
-        } else {
-            Swal.fire("Error", res.msg, "error");
-        }
+      const anio = document.getElementById('anioMasivo').value;
+      const mes = document.getElementById('mesMasivo').value;
+      
+      if(!confirm(`¿Desea generar las cuotas de TODOS los voluntarios para el mes ${mes} del año ${anio}?`)) return;
+      
+      mostrarLoader();
+      const res = await generarCuotasMasivas(anio, mes);
+      ocultarLoader();
+      
+      if(res.ok) {
+        Swal.fire("Proceso Terminado", `Se generaron ${res.cantidad} cuotas nuevas.`, "success");
+        cargarDeudas();
+      } else {
+        Swal.fire("Error", res.msg, "error");
+      }
     }
 
     async function generarCobroExtra() {
-        const motivo = document.getElementById('motivoExtra').value;
-        const monto = document.getElementById('montoExtra').value;
-
-        if(!motivo || !monto) return Swal.fire("Atención", "Complete motivo y monto", "warning");
-        if(!confirm(`¿Generar cobro de $${monto} por '${motivo}' a TODOS los voluntarios?`)) return;
-
-        mostrarLoader();
-        const res = await generarCobroExtraMasivo(motivo, monto);
-        ocultarLoader();
-
-        if(res.ok) {
-            Swal.fire("Éxito", `Se asignó el cobro a ${res.cantidad} voluntarios.`, "success");
-            cargarDeudas();
-        } else {
-            Swal.fire("Error", res.msg, "error");
-        }
+      const motivo = document.getElementById('motivoExtra').value;
+      const monto = document.getElementById('montoExtra').value;
+      
+      if(!motivo || !monto) return Swal.fire("Atención", "Complete motivo y monto", "warning");
+      if(!confirm(`¿Generar cobro de $${monto} por '${motivo}' a TODOS los voluntarios?`)) return;
+      
+      mostrarLoader();
+      const res = await generarCobroExtraMasivo(motivo, monto);
+      ocultarLoader();
+      
+      if(res.ok) {
+        Swal.fire("Éxito", `Se asignó el cobro a ${res.cantidad} voluntarios.`, "success");
+        cargarDeudas();
+      } else {
+        Swal.fire("Error", res.msg, "error");
+      }
     }
 
-    // Helpers UI
+    // --- HELPERS ---
+    function normalizarRut(rut) {
+      if (!rut) return "";
+      return String(rut).toUpperCase().replace(/[^0-9K]/g, "");
+    }
     function mostrarLoader() { document.getElementById('loader').style.display = 'block'; }
     function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
-    function normalizarRut(rut) { return String(rut).toUpperCase().replace(/[^0-9K]/g, ""); } // Mismo que Utils
   </script>
 </body>
 </html>
