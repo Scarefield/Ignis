@@ -160,35 +160,28 @@
       btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>VERIFICANDO...';
 
       // Llamamos a la función Login que está en js/auth.js (reemplaza a google.script.run)
-      autenticarUsuario(rol, rut, clave).then(res => {
-        
+   login(rol, rut, clave).then(res => {
         if (res.ok) {
-            // Éxito: Redirigimos
-            // La URL de destino se construye basada en el 'page' que nos devuelve la lógica
-            // Ejemplo: dashboard.html?page=voluntario_home&rut=...
-           // CORRECCIÓN: Usamos res.page para ir al archivo html específico (tesoreria.html, voluntario_home.html, etc)
-const destino = `${res.page}.html?rut=${encodeURIComponent(rut)}&nombre=${encodeURIComponent(res.nombre)}&rol=${res.rol}`;
-            
             Swal.fire({
               title: '¡Acceso Autorizado!',
               text: `Bienvenido(a), ${res.nombre}`,
               icon: 'success',
               confirmButtonText: 'ABRIR PANEL',
-              confirmButtonColor: '#198754',
-              allowOutsideClick: false,
-              showClass: { popup: 'animate__animated animate__zoomIn' }
+              confirmButtonColor: '#198754'
             }).then((result) => {
               if (result.isConfirmed) {
+                // REDIRECCIÓN A LA PÁGINA ESPECÍFICA HTML
+                const destino = `${res.page}.html?rut=${encodeURIComponent(rut)}&nombre=${encodeURIComponent(res.nombre)}&rol=${encodeURIComponent(res.rol)}`;
                 window.location.href = destino;
               }
             });
-
         } else {
-          // Error
-          Swal.fire('Error de Autenticación', res.msg, 'error');
-          btn.disabled = false;
-          btn.innerHTML = 'INGRESAR';
+            Swal.fire('Error', res.msg, 'error');
+            // Restaurar botón
+            btn.disabled = false;
+            btn.innerHTML = 'INGRESAR AL SISTEMA';
         }
+    });
 
       }).catch(err => {
         console.error(err);
