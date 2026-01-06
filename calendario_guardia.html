@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/guardia_backend.js"></script>
+
+  <style>
+    body { font-family: 'Roboto', sans-serif; background: #eceff1; padding: 20px; }
+    .header-cal { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h2 { margin: 0; color: #b71c1c; text-transform: uppercase; font-size: 1.2rem; }
+    
+    /* GRID CALENDARIO */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    
+    .day-header { background: #37474f; color: white; text-align: center; padding: 10px; font-weight: bold; border-radius: 4px; }
+    
+    .day-cell { background: #fff; min-height: 120px; border-radius: 4px; padding: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; }
+    .day-cell.empty { background: transparent; box-shadow: none; }
+    
+    .day-number { font-weight: bold; color: #455a64; margin-bottom: 5px; border-bottom: 1px solid #eee; }
+    
+    .vol-list { font-size: 0.8em; }
+    .vol-item { margin-bottom: 2px; padding: 2px 4px; border-radius: 3px; background: #eee; display: flex; justify-content: space-between; }
+    .vol-m { background: #e3f2fd; color: #0d47a1; } /* Hombre */
+    .vol-f { background: #fce4ec; color: #c2185b; } /* Mujer */
+    
+    .badge-cama { background: rgba(0,0,0,0.1); padding: 0 4px; border-radius: 4px; font-weight: bold; margin-right: 4px; }
+  </style>
+</head>
+<body>
+
+  <div class="header-cal">
+    <h2 id="tituloMes">Cargando...</h2>
+    <div style="font-size:0.9em; color:#666;">
+       <span style="display:inline-block; width:10px; height:10px; background:#e3f2fd; margin-right:5px;"></span>Hombres
+       <span style="display:inline-block; width:10px; height:10px; background:#fce4ec; margin-left:10px; margin-right:5px;"></span>Mujeres
+    </div>
+  </div>
+
+  <div class="calendar-grid" id="grid">
+     <div class="day-header">Dom</div>
+     <div class="day-header">Lun</div>
+     <div class="day-header">Mar</div>
+     <div class="day-header">Mié</div>
+     <div class="day-header">Jue</div>
+     <div class="day-header">Vie</div>
+     <div class="day-header">Sáb</div>
+     
+     </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const params = new URLSearchParams(window.location.search);
+      const anio = parseInt(params.get('anio')) || new Date().getFullYear();
+      const mes = parseInt(params.get('mes')) || (new Date().getMonth() + 1);
+
+      document.getElementById('tituloMes').innerText = `Guardia Nocturna - ${mes}/${anio}`;
+      
+      cargarCalendario(anio, mes);
+  });
+
+  async function cargarCalendario(anio, mes) {
+      // Llamada al backend JS
+      const datos = await getCalendarioData(anio, mes);
+      
+      const grid = document.getElementById('grid');
+      // Limpiar celdas viejas (mantener headers que son los primeros 7 divs)
+      while(grid.children.length > 7) {
+         grid.removeChild(grid.lastChild);
+      }
+
+      // Lógica de calendario (igual a tu script original)
+      const primerDia = new Date(anio, mes - 1, 1).getDay(); // 0=Dom
+      const diasEnMes = new Date(anio, mes, 0).getDate();
+
+      // Celdas vacías
+      for(let i=0; i<primerDia; i++) {
+         const div = document.createElement('div');
+         div.className = 'day-cell empty';
+         grid.appendChild(div);
+      }
+
+      // Días
+      for(let dia=1; dia<=diasEnMes; dia++) {
+         const div = document.createElement('div');
+         div.className = 'day-cell';
+         
+         const num = document.createElement('div');
+         num.className = 'day-number';
+         num.innerText = dia;
+         div.appendChild(num);
+
+         // Lista de voluntarios para este día
+         if(datos[dia]) {
+             datos[dia].forEach(v => {
+                 const item = document.createElement('div');
+                 const clase = v.genero === 'Masculino' ? 'vol-m' : 'vol-f';
+                 item.className = 'vol-item ' + clase;
+                 
+                 // Nombre corto
+                 const partes = v.nombre.split(' ');
+                 const corto = partes[0] + " " + (partes[1] ? partes[1][0]+'.' : '');
+                 
+                 item.innerHTML = `<span class="badge-cama">${v.cama}</span> ${corto}`;
+                 div.appendChild(item);
+             });
+         }
+         grid.appendChild(div);
+      }
+  }
+</script>
+</body>
+</html>
