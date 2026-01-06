@@ -1,24 +1,22 @@
 /**
- * auth_backend.js
- * Lógica de Autenticación - Versión Corregida
+ * auth_backend.js - Versión Limpia
  */
 
 async function login(rolSolicitado, rut, clave) {
-    console.log("Intentando login...", rolSolicitado, rut);
-
+    
     // 1. Normalizar RUT
     const rBusq = normalizarRut(rut);
 
-    // 2. Lógica para CONDUCTORES (Tabla separada, sin clave)
+    // 2. Lógica Conductor (Tabla separada)
     if (rolSolicitado === 'conductor') {
         const { data: conductor, error } = await clienteSupabase
-            .from('conductores') // Asegúrate que esta tabla exista en Supabase
+            .from('conductores')
             .select('*')
             .eq('rut', rBusq)
             .single();
 
         if (error || !conductor) {
-            return { ok: false, msg: "Conductor no encontrado o no habilitado." };
+            return { ok: false, msg: "Conductor no encontrado." };
         }
 
         return {
@@ -30,7 +28,7 @@ async function login(rolSolicitado, rut, clave) {
         };
     }
 
-    // 3. Lógica para VOLUNTARIOS Y OFICIALES
+    // 3. Lógica Voluntarios
     const { data: voluntario, error } = await clienteSupabase
         .from('voluntarios')
         .select('*')
@@ -38,37 +36,33 @@ async function login(rolSolicitado, rut, clave) {
         .single();
 
     if (error || !voluntario) {
-        return { ok: false, msg: "Usuario no encontrado en registros." };
+        return { ok: false, msg: "Usuario no encontrado." };
     }
 
-    // Validar estado (ACTIVO o SI)
-    // Nota: Ajusta esto según cómo guardes el estado en tu BD ('ACTIVO', 'SI', etc.)
-    const estado = (voluntario.estado || '').toUpperCase();
+    // Validar Estado
+    const estado = String(voluntario.estado || '').toUpperCase();
     if (estado !== 'ACTIVO' && estado !== 'SI') {
-        return { ok: false, msg: "Usuario inactivo o suspendido." };
+        return { ok: false, msg: "Usuario inactivo." };
     }
 
-    // Validar contraseña
+    // Validar Clave
     if (String(voluntario.clave) !== String(clave)) {
         return { ok: false, msg: "Contraseña incorrecta." };
     }
 
-    // Validar Roles
+    // Validar Rango y Rol
     const rolReal = String(voluntario.rol || '').toLowerCase().trim();
     const rolSol = rolSolicitado.toLowerCase().trim();
 
-    // Caso Teniente
     if (rolSol === 'teniente') {
-        if (rolReal.includes('teniente')) {
-             return { ok: true, page: 'teniente_dashboard', nombre: voluntario.nombre, rol: voluntario.rol, rut: rBusq };
-        } else {
-             return { ok: false, msg: "Usted no tiene rango de Teniente." };
+        if (!rolReal.includes('teniente')) {
+             return { ok: false, msg: "No tiene rango de Teniente." };
         }
+        return { ok: true, page: 'teniente_dashboard', nombre: voluntario.nombre, rol: voluntario.rol, rut: rBusq };
     }
 
-    // Caso Otros Oficiales
     if (rolSol !== 'voluntario' && rolReal !== rolSol) {
-        return { ok: false, msg: "No tienes permisos de " + rolSolicitado };
+        return { ok: false, msg: "No tiene permisos de " + rolSolicitado };
     }
 
     // Mapa de Destinos
@@ -82,9 +76,8 @@ async function login(rolSolicitado, rut, clave) {
         'maquinista': 'voluntario_home'
     };
 
-    let paginaDestino = destinos[rolSol] || 'index';
+    const paginaDestino = destinos[rolSol] || 'index';
 
-    // Retorno final
     return { 
         ok: true, 
         page: paginaDestino, 
