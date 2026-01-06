@@ -2,19 +2,14 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ignis - Login</title>
-  
+  <title>Portal Bomberos - Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth_backend.js"></script>    <style>
-    /* TUS ESTILOS EXACTOS */
+  <script src="js/supabase.js"></script>     <script src="js/utils.js"></script>        <script src="js/auth_backend.js"></script> <style>
     body { 
       background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
                   url('https://images.unsplash.com/photo-1516533075015-a3838414c3ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80'); 
@@ -27,168 +22,160 @@
       font-family: 'Poppins', sans-serif;
     }
 
-    .login-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .login-container {
+      background: rgba(255, 255, 255, 0.95);
       padding: 40px;
       border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
       width: 100%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      max-width: 420px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .ignis-title {
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      color: #fff;
-      font-size: 2.5rem;
-      margin-bottom: 5px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
+    .login-header { text-align: center; margin-bottom: 30px; }
+    .login-header h2 { font-family: 'Cinzel', serif; color: #b71c1c; font-weight: 700; font-size: 2rem; letter-spacing: 1px; margin-bottom: 5px; }
+    .login-header p { color: #666; font-size: 0.9rem; }
 
-    .ignis-subtitle {
-      color: #ff6b6b;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-bottom: 30px;
-      font-weight: 600;
-    }
-
-    .form-control, .form-select {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: white;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 15px;
-    }
-
-    .form-control:focus, .form-select:focus {
-      background: rgba(0, 0, 0, 0.7);
-      border-color: #ff6b6b;
-      color: white;
-      box-shadow: none;
-    }
+    .form-floating > label { color: #777; }
+    .form-control:focus { border-color: #b71c1c; box-shadow: 0 0 0 0.25rem rgba(183, 28, 28, 0.25); }
 
     .btn-login {
-      background: #b71c1c;
+      background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);
       border: none;
-      width: 100%;
       padding: 12px;
-      border-radius: 10px;
-      color: white;
       font-weight: 600;
       letter-spacing: 1px;
-      transition: all 0.3s;
       margin-top: 10px;
+      transition: all 0.3s;
     }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(183, 28, 28, 0.4); background: linear-gradient(135deg, #c62828 0%, #e53935 100%); }
 
-    .btn-login:hover {
-      background: #d32f2f;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(183, 28, 28, 0.4);
+    .footer-text { text-align: center; margin-top: 25px; font-size: 0.8rem; color: #888; }
+    
+    .role-badge { 
+      position: absolute; top: -10px; right: -10px; 
+      background: #b71c1c; color: white; 
+      padding: 20px 15px 10px 15px; 
+      border-radius: 0 0 0 30px; font-size: 0.8rem; font-weight: bold; 
     }
-
-    .input-icon { position: relative; }
-    .input-icon i {
-      position: absolute;
-      left: 15px;
-      top: 15px;
-      color: #aaa;
-    }
-    .input-icon input, .input-icon select { padding-left: 40px; }
-
-    ::placeholder { color: #ccc; }
   </style>
 </head>
 <body>
 
-  <div class="login-card animate__animated animate__fadeIn">
-    <div class="ignis-title">Ignis</div>
-    <div class="ignis-subtitle">La evolución del servicio</div>
-
-    <div class="input-icon">
-      <i class="fas fa-user-tag"></i>
-      <select id="rol" class="form-select">
-        <option value="" selected disabled>Seleccione Rol</option>
-        <option value="voluntario">Voluntario</option>
-        <option value="maquinista">Maquinista</option>
-        <option value="conductor">Conductor (Rentado)</option>
-        <option value="teniente">Teniente</option>
-        <option value="capitan">Capitán</option>
-        <option value="ayudante">Ayudante</option>
-        <option value="secretario">Secretario</option>
-        <option value="tesorero">Tesorero</option>
-        <option value="jefe_guardia">Jefe de Guardia</option>
-      </select>
-    </div>
-
-    <div class="input-icon">
-      <i class="fas fa-id-card"></i>
-      <input type="text" id="rut" class="form-control" placeholder="RUT (12345678-9)">
-    </div>
-
-    <div class="input-icon">
-      <i class="fas fa-lock"></i>
-      <input type="password" id="clave" class="form-control" placeholder="Contraseña">
-    </div>
-
-    <button class="btn-login" id="btnIngresar" onclick="iniciarSesionSistema()">
-      INGRESAR
-    </button>
+  <div class="login-container animate__animated animate__fadeInUp">
+    <div class="role-badge">V 2.0</div>
     
-    <div class="mt-3">
-      <small><a href="#" class="text-white-50 text-decoration-none">Desarrolado por un voluntario</a></small>
+    <div class="login-header">
+      <h2>IGNIS</h2>
+      <p>Gestión de Cuerpo de Bomberos</p>
+    </div>
+
+    <form id="loginForm" onsubmit="event.preventDefault();">
+      <div class="mb-3">
+        <label class="form-label fw-bold text-secondary">Seleccione su Rol</label>
+        <select class="form-select form-select-lg" id="rol" onchange="toggleClave()">
+          <option value="voluntario" selected>Voluntario</option>
+          <option value="maquinista">Maquinista</option>
+          <option value="conductor">Conductor (Rentado)</option>
+          <option disabled>──────────</option>
+          <option value="teniente">Teniente</option>
+          <option value="capitan">Capitán</option>
+          <option value="ayudante">Ayudante</option>
+          <option value="secretario">Secretario</option>
+          <option value="tesorero">Tesorero</option>
+          <option value="jefe_guardia">Jefe de Guardia</option>
+        </select>
+      </div>
+
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="rut" placeholder="12345678-9" required>
+        <label for="rut"><i class="fas fa-id-card me-2"></i>RUT (sin puntos)</label>
+      </div>
+
+      <div class="form-floating mb-4" id="divClave">
+        <input type="password" class="form-control" id="clave" placeholder="Contraseña">
+        <label for="clave"><i class="fas fa-lock me-2"></i>Contraseña</label>
+      </div>
+
+      <button type="button" class="btn btn-primary w-100 btn-login" onclick="iniciarSesionSistema()" id="btnLogin">
+        INGRESAR AL SISTEMA
+      </button>
+    </form>
+
+    <div class="footer-text">
+      &copy; 2026 Systema Ignis - Bomberos de Chile
+      <br>
+      <a href="#" class="text-decoration-none text-danger small mt-2 d-inline-block" onclick="recuperar()">¿Olvidaste tu contraseña?</a>
     </div>
   </div>
 
   <script>
-    // Función wrapper que conecta el HTML con tu lógica en JS/auth.js
+    // 1. Alternar visibilidad de clave según rol
+    function toggleClave() {
+      const rol = document.getElementById('rol').value;
+      const divClave = document.getElementById('divClave');
+      if (rol === 'conductor') {
+        divClave.style.display = 'none';
+      } else {
+        divClave.style.display = 'block';
+      }
+    }
+
+    // 2. Función Principal de Login
     function iniciarSesionSistema() {
-      const btn = document.getElementById('btnIngresar');
+      const btn = document.getElementById('btnLogin');
       const rut = document.getElementById('rut').value;
       const rol = document.getElementById('rol').value;
       const clave = document.getElementById('clave').value;
 
-      if (!rut) return Swal.fire('Acceso Denegado', 'Debe ingresar su RUT reglamentario', 'warning');
-      if (!rol) return Swal.fire('Acceso Denegado', 'Debe seleccionar un Rol', 'warning');
+      // Validación simple
+      if (!rut) return Swal.fire('Atención', 'Debe ingresar su RUT', 'warning');
+      if (rol !== 'conductor' && !clave) return Swal.fire('Atención', 'Debe ingresar su contraseña', 'warning');
 
+      // UI Loading
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>VERIFICANDO...';
 
-      // Llamamos a la función Login que está en js/auth.js (reemplaza a google.script.run)
-   login(rol, rut, clave).then(res => {
-        if (res.ok) {
-            Swal.fire({
-              title: '¡Acceso Autorizado!',
-              text: `Bienvenido(a), ${res.nombre}`,
-              icon: 'success',
-              confirmButtonText: 'ABRIR PANEL',
-              confirmButtonColor: '#198754'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // REDIRECCIÓN A LA PÁGINA ESPECÍFICA HTML
-                const destino = `${res.page}.html?rut=${encodeURIComponent(rut)}&nombre=${encodeURIComponent(res.nombre)}&rol=${encodeURIComponent(res.rol)}`;
-                window.location.href = destino;
-              }
-            });
-        } else {
-            Swal.fire('Error', res.msg, 'error');
-            // Restaurar botón
+      // Llamada al Backend (auth_backend.js)
+      login(rol, rut, clave)
+        .then(res => {
+            if (res.ok) {
+                // Éxito
+                Swal.fire({
+                  title: '¡Acceso Autorizado!',
+                  text: `Bienvenido(a), ${res.nombre}`,
+                  icon: 'success',
+                  confirmButtonText: 'ENTRAR',
+                  confirmButtonColor: '#198754',
+                  allowOutsideClick: false
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    // Redirección segura
+                    const url = `${res.page}.html?rut=${encodeURIComponent(rut)}&nombre=${encodeURIComponent(res.nombre)}&rol=${encodeURIComponent(res.rol)}`;
+                    window.location.href = url;
+                  }
+                });
+            } else {
+                // Error de credenciales
+                Swal.fire('Error', res.msg, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'INGRESAR AL SISTEMA';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire('Error del Sistema', 'No se pudo conectar con la base de datos.', 'error');
             btn.disabled = false;
             btn.innerHTML = 'INGRESAR AL SISTEMA';
-        }
-   });
-      }).catch(err => {
-        console.error(err);
-        Swal.fire('Error del Sistema', 'No se pudo conectar con la base de datos.', 'error');
-        btn.disabled = false;
-        btn.innerHTML = 'INGRESAR';
-      });
+        });
+    }
+
+    // 3. Recuperar Clave (Simulado)
+    function recuperar() {
+        Swal.fire('Información', 'Contacte al Oficial o Ayudante a cargo para restablecer su clave.', 'info');
     }
   </script>
+
 </body>
 </html>
