@@ -149,6 +149,7 @@
         // Aquí pegas los links largos de Google Apps Script de cada compañía
         const DIRECTORIO = {
             "san_bernardo": {
+                "comandancia": "PEGAR_AQUI_LINK_COMANDANCIA",
                 "1": "https://script.google.com/macros/s/AKfycbwLNesRkX5SNIcmU_PB2Zuia7hCqBK9qsekDcTAt_PZy8egEClwM2vx7gwCL2teKZF3/exec",
                 
             },
@@ -158,22 +159,41 @@
             const cuerpo = document.getElementById('cuerpo').value;
             const selectCia = document.getElementById('compania');
             
-            selectCia.innerHTML = '<option value="" selected disabled>Seleccione Compañía</option>';
+            selectCia.innerHTML = '<option value="" selected disabled>Seleccione Unidad</option>';
             selectCia.disabled = false;
 
             if (DIRECTORIO[cuerpo]) {
                 const cias = Object.keys(DIRECTORIO[cuerpo]);
-                cias.forEach(num => {
-                    let nombre = num + "ª Compañía";
+                
+                // Ordenamos para que Comandancia salga primero o al final, según prefieras
+                // Aquí lo dejamos al principio si la clave es string, o numérico después
+                
+                cias.forEach(key => {
+                    let nombre;
+                    
+                    // Lógica para diferenciar Comandancia de las Compañías
+                    if (key === "comandancia") {
+                        nombre = "🏛️ Comandancia General"; // Nombre especial con icono
+                    } else {
+                        nombre = key + "ª Compañía"; // Nombre estándar
+                    }
+
                     let option = document.createElement("option");
-                    option.value = num;
+                    option.value = key;
                     option.text = nombre;
+                    
+                    // Estilo opcional: Resaltar Comandancia
+                    if(key === "comandancia") {
+                        option.style.fontWeight = "bold";
+                        option.style.color = "#ff4757"; 
+                    }
+
                     selectCia.add(option);
                 });
             }
         }
 
-        function irAlSistema() {
+      function irAlSistema() {
             const cuerpo = document.getElementById('cuerpo').value;
             const cia = document.getElementById('compania').value;
 
@@ -181,7 +201,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Faltan datos',
-                    text: 'Por favor seleccione Cuerpo y Compañía',
+                    text: 'Por favor seleccione Cuerpo y Unidad',
                     confirmButtonColor: '#ff4757'
                 });
                 return;
@@ -194,19 +214,16 @@
                 Swal.fire({
                     title: 'Iniciando Sistema Ignis',
                     text: 'Estableciendo conexión segura...',
-                    timer: 1000,
+                    timer: 1500,
                     timerProgressBar: true,
                     showConfirmButton: false,
-                    background: '#1e272e', // Color oscuro acorde a tu tema
+                    background: '#1e272e', 
                     color: '#fff',
                     didOpen: () => {
                         Swal.showLoading();
                     }
                 }).then(() => {
-                    // AQUÍ ESTÁ EL TRUCO:
-                    // En lugar de irse (window.location), borramos el portal
-                    // y creamos un iframe que ocupe el 100% de la pantalla
-                    
+                    // Carga en Iframe pantalla completa
                     document.body.innerHTML = `
                         <iframe src="${urlDestino}" 
                                 style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999; background-color: #1e272e;"
@@ -215,7 +232,7 @@
                     `;
                 });
             } else {
-                Swal.fire('Error', 'Sistema no disponible para esta compañía aún.', 'warning');
+                Swal.fire('Error', 'Sistema no disponible para esta unidad aún.', 'warning');
             }
         }
     </script>
