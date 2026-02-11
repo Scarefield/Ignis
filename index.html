@@ -1,49 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ignis</title>
-    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 95C30 95 20 70 20 50C20 25 50 5 50 5C50 5 80 25 80 50C80 70 70 95 50 95Z" fill="%23ff4757"/><circle cx="85" cy="30" r="3" fill="%23ff4757"/><circle cx="15" cy="40" r="2" fill="%23ff4757"/></svg>'>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Acceso Ignis</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body {
-            background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
-                        url('https://images.unsplash.com/photo-1516533075015-a3838414c3ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80');
-            background-size: cover;
-            background-position: center;
-            min-height: 100vh; /* Permite crecer si el contenido lo requiere */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Poppins', sans-serif;
-            color: white;
+        /* --- FONDO Y ESTRUCTURA BASE --- */
+        body { 
+            background-color: #0a0a0a;
+            background-image: radial-gradient(circle at 50% 100%, #2a0a0a 0%, #000000 100%);
+            /* Cambio clave: min-height permite scroll si es necesario */
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: 'Outfit', sans-serif;
             margin: 0;
-            padding: 20px; /* Espacio alrededor en móviles */
-            overflow-y: auto; /* Habilitar scroll si es necesario */
+            padding: 20px; /* Margen de seguridad para móviles */
+            overflow-y: auto; /* Permite scroll vertical */
+            position: relative;
         }
 
+        /* --- TARJETA PRINCIPAL --- */
         .portal-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 40px;
-            border-radius: 20px;
+            border-radius: 24px;
             width: 100%;
-            max-width: 450px;
+            max-width: 420px; /* Un poco más estrecha para elegancia */
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            margin: auto; /* Centrado seguro */
+            position: relative;
+            z-index: 1;
+            margin: auto; /* Centrado vertical flex */
         }
 
-        /* LOGO IGNIS */
+        /* LOGO */
         .ignis-logo-svg {
-            width: 80px; /* Ligeramente más pequeño para ahorrar espacio */
-            height: 80px;
+            width: 85px;
+            height: 85px;
             margin-bottom: 10px;
             animation: burn 3s infinite ease-in-out;
             filter: drop-shadow(0 0 15px rgba(220, 20, 60, 0.6));
@@ -58,7 +63,7 @@
         .ignis-text {
             font-family: 'Cinzel', serif;
             font-weight: 700;
-            font-size: 2.5rem; /* Ajustado */
+            font-size: 2.8rem;
             color: white;
             line-height: 1;
             margin-bottom: 5px;
@@ -66,29 +71,30 @@
         }
 
         .ignis-slogan {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             color: #ff4757;
             font-weight: 600;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         /* FORMULARIOS */
         .form-select {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 10px;
-            padding: 12px 15px; /* Padding reducido para móviles */
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e0e0e0;
+            border-radius: 12px;
+            padding: 14px;
             margin-bottom: 15px;
             font-size: 0.95rem;
+            cursor: pointer;
         }
         
         .form-select:focus {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             border-color: #ff4757;
-            box-shadow: none;
+            box-shadow: 0 0 0 0.2rem rgba(255, 71, 87, 0.25);
             color: white;
         }
         
@@ -97,55 +103,82 @@
             color: white;
         }
 
+        /* BOTÓN */
         .btn-go {
-            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
             border: none;
             width: 100%;
-            padding: 14px;
-            border-radius: 10px;
+            padding: 16px;
+            border-radius: 12px;
             color: white;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
+            letter-spacing: 1.5px;
+            margin-top: 15px;
             transition: all 0.3s;
-            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
         }
 
         .btn-go:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.4);
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5);
+            background: linear-gradient(135deg, #ff2e43 0%, #ff4757 100%);
         }
 
-        /* --- RESPONSIVIDAD MEJORADA --- */
+        .btn-go:active { transform: translateY(0); }
+
+        /* --- RESPONSIVIDAD (MÓVIL) --- */
         @media (max-width: 480px) {
             body {
                 padding: 15px;
-                align-items: flex-start; /* Evita centrado vertical forzado si hay teclado virtual */
+                /* Alineación al inicio para evitar que el teclado virtual tape el input */
+                align-items: flex-start; 
             }
-            
+
             .portal-card {
-                padding: 25px 20px;
-                margin-top: 20px; /* Espacio superior */
-                margin-bottom: 20px; /* Espacio inferior */
+                padding: 30px 20px; /* Reducir relleno interno */
+                margin-top: 20px;   /* Espacio arriba */
+                margin-bottom: 20px;
             }
 
-            .ignis-text {
-                font-size: 2rem;
-            }
-
-            .ignis-logo-svg {
-                width: 60px;
-                height: 60px;
-            }
+            .ignis-text { font-size: 2.2rem; }
+            .ignis-logo-svg { width: 70px; height: 70px; }
+            .ignis-slogan { font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 20px; }
             
-            .form-select {
-                font-size: 16px; /* Evita zoom en iOS al hacer foco */
-            }
+            .btn-go { padding: 14px; font-size: 0.9rem; }
+            .form-select { padding: 12px; font-size: 16px; /* Evita zoom en iOS */ }
+        }
+
+        /* FONDO ANIMADO */
+        .embers {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .ember {
+            position: absolute; bottom: -10px;
+            width: 4px; height: 4px; background: #ff4500;
+            border-radius: 50%; opacity: 0;
+            animation: rise 10s infinite ease-in;
+            box-shadow: 0 0 10px #ff4500;
+        }
+        .ember:nth-child(1) { left: 10%; animation-duration: 8s; }
+        .ember:nth-child(2) { left: 30%; animation-duration: 12s; width: 6px; height: 6px; }
+        .ember:nth-child(3) { left: 70%; animation-duration: 7s; }
+        .ember:nth-child(4) { left: 90%; animation-duration: 11s; width: 3px; height: 3px; }
+        .ember:nth-child(5) { left: 50%; animation-duration: 9s; }
+
+        @keyframes rise {
+            0% { bottom: -10px; opacity: 0; }
+            20% { opacity: 1; }
+            100% { bottom: 100%; opacity: 0; }
         }
     </style>
 </head>
 <body>
+
+    <div class="embers">
+        <div class="ember"></div><div class="ember"></div><div class="ember"></div><div class="ember"></div><div class="ember"></div>
+    </div>
 
     <div class="portal-card animate__animated animate__fadeInUp">
         
@@ -162,7 +195,7 @@
         <select id="cuerpo" class="form-select" onchange="cargarCompanias()">
             <option value="" selected disabled>Seleccione Cuerpo de Bomberos</option>
             <option value="san_bernardo">CB San Bernardo</option>
-            </select>
+        </select>
 
         <select id="compania" class="form-select" disabled>
             <option value="" selected disabled>Seleccione Compañía</option>
@@ -179,13 +212,11 @@
 
     <script>
         // === CONFIGURACIÓN DE LINKS ===
-        // Aquí pegas los links largos de Google Apps Script de cada compañía
         const DIRECTORIO = {
             "san_bernardo": {
                 "comandancia": "https://script.google.com/macros/s/AKfycbyI5wm5P3UX5JmB3fkBJOA9BersDPcnKo1Q_6p3PpjLPT8OCIET3wKrKAg7YdSrjL9vHQ/exec",
                 "1": "https://script.google.com/macros/s/AKfycbz5iSrHO4ySvk07nzoM08qJGpIKXjsL7JU6hpisEz99RcLVTGumM27ZwlEbKyHo2ZkDnw/exec?cia=CBSB_1",
                 "2": "https://script.google.com/macros/s/AKfycbz5iSrHO4ySvk07nzoM08qJGpIKXjsL7JU6hpisEz99RcLVTGumM27ZwlEbKyHo2ZkDnw/exec?cia=CBSB_2",
-                
             },
         };
 
@@ -193,50 +224,60 @@
             const cuerpo = document.getElementById('cuerpo').value;
             const selectCia = document.getElementById('compania');
             
-            selectCia.innerHTML = '<option value="" selected disabled>Seleccione Unidad</option>';
-            selectCia.disabled = false;
+            // Animación suave al resetear
+            selectCia.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                selectCia.innerHTML = '<option value="" selected disabled>Seleccione Unidad</option>';
+                selectCia.disabled = false;
+                selectCia.style.opacity = '1';
 
-            if (DIRECTORIO[cuerpo]) {
-                const cias = Object.keys(DIRECTORIO[cuerpo]);
-                
-                // Ordenamos para que Comandancia salga primero o al final, según prefieras
-                // Aquí lo dejamos al principio si la clave es string, o numérico después
-                
-                cias.forEach(key => {
-                    let nombre;
+                if (DIRECTORIO[cuerpo]) {
+                    const cias = Object.keys(DIRECTORIO[cuerpo]);
                     
-                    // Lógica para diferenciar Comandancia de las Compañías
-                    if (key === "comandancia") {
-                        nombre = "Comandancia General"; // Nombre especial con icono
-                    } else {
-                        nombre = key + "ª Compañía"; // Nombre estándar
-                    }
+                    // Ordenar: Comandancia primero, luego números
+                    cias.sort((a, b) => {
+                        if(a === 'comandancia') return -1;
+                        if(b === 'comandancia') return 1;
+                        return parseInt(a) - parseInt(b);
+                    });
 
-                    let option = document.createElement("option");
-                    option.value = key;
-                    option.text = nombre;
-                    
-                    // Estilo opcional: Resaltar Comandancia
-                    if(key === "comandancia") {
-                        option.style.fontWeight = "bold";
-                        option.style.color = "#ff4757"; 
-                    }
+                    cias.forEach(key => {
+                        let nombre;
+                        if (key === "comandancia") {
+                            nombre = "Comandancia General"; 
+                        } else {
+                            nombre = key + "ª Compañía"; 
+                        }
 
-                    selectCia.add(option);
-                });
-            }
+                        let option = document.createElement("option");
+                        option.value = key;
+                        option.text = nombre;
+                        
+                        // Resaltar Comandancia
+                        if(key === "comandancia") {
+                            option.style.fontWeight = "bold";
+                            option.style.color = "#ff4757"; 
+                        }
+
+                        selectCia.add(option);
+                    });
+                }
+            }, 150);
         }
 
-      function irAlSistema() {
+        function irAlSistema() {
             const cuerpo = document.getElementById('cuerpo').value;
             const cia = document.getElementById('compania').value;
 
             if (!cuerpo || !cia) {
                 Swal.fire({
-                    icon: 'error',
+                    icon: 'warning',
                     title: 'Faltan datos',
                     text: 'Por favor seleccione Cuerpo y Unidad',
-                    confirmButtonColor: '#ff4757'
+                    confirmButtonColor: '#ff4757',
+                    background: '#1e272e',
+                    color: '#fff'
                 });
                 return;
             }
@@ -244,10 +285,10 @@
             const urlDestino = DIRECTORIO[cuerpo][cia];
             
             if (urlDestino) {
-                // Animación de carga
+                // Alerta de carga estilo oscuro
                 Swal.fire({
-                    title: 'Iniciando Sistema Ignis',
-                    text: 'Estableciendo conexión segura...',
+                    title: 'Conectando...',
+                    text: 'Estableciendo enlace seguro con la unidad',
                     timer: 1500,
                     timerProgressBar: true,
                     showConfirmButton: false,
@@ -259,10 +300,16 @@
                 }).then(() => {
                     // Carga en Iframe pantalla completa
                     document.body.innerHTML = `
+                        <div style="background-color:#000; width:100%; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                            <div style="color:#ff4757; font-family:'Cinzel', serif; font-size:2rem; animation: pulse 1s infinite;">IGNIS</div>
+                            <div style="color:#666; font-family:'Outfit', sans-serif; font-size:0.8rem; margin-top:10px;">Cargando interfaz...</div>
+                        </div>
                         <iframe src="${urlDestino}" 
-                                style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999; background-color: #1e272e;"
+                                style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999; opacity:0; transition: opacity 0.8s;"
+                                onload="this.style.opacity=1"
                                 allow="geolocation; microphone; camera; fullscreen">
                         </iframe>
+                        <style>@keyframes pulse { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }</style>
                     `;
                 });
             } else {
