@@ -258,9 +258,15 @@
                 &copy; 2026 Ignis Platform.
             </div>
             
-            <a href="#privacidad" class="privacy-link" data-bs-toggle="modal" data-bs-target="#privacyModal">
-                <i class="fas fa-lock me-1"></i> Política de Privacidad
-            </a>
+            <div class="d-flex justify-content-center gap-3 mt-3">
+    <a href="#privacidad" class="privacy-link" data-bs-toggle="modal" data-bs-target="#privacyModal">
+        <i class="fas fa-shield-alt me-1"></i> Privacidad
+    </a>
+    <span class="text-muted small">|</span>
+    <a href="#politicas" class="privacy-link" data-bs-toggle="modal" data-bs-target="#termsModal">
+        <i class="fas fa-file-contract me-1"></i> Términos
+    </a>
+</div>
 
         </div>
     </div>
@@ -347,6 +353,52 @@
         </div>
     </div>
 
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content modal-content-dark">
+            <div class="modal-header modal-header-dark">
+                <h5 class="modal-title"><i class="fas fa-file-contract text-accent me-2"></i>Términos de Uso</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small fst-italic mb-3">Última actualización: Febrero 2026</p>
+
+                <h6 class="text-accent fw-bold">1. Aceptación</h6>
+                <p class="small">Al acceder y utilizar el sistema <strong>Ignis</strong> ("el Servicio"), usted y la Institución que representa aceptan cumplir con estos Términos y Condiciones. Si no está de acuerdo, no utilice el servicio.</p>
+
+                <h6 class="text-accent fw-bold mt-3">2. Descripción del Servicio</h6>
+                <p class="small">Ignis es una herramienta de gestión administrativa (asistencia, tesorería, inventario) para Cuerpos de Bomberos. El servicio se proporciona "tal cual" (As-Is) y "según disponibilidad".</p>
+
+                <h6 class="text-accent fw-bold mt-3">3. Limitación de Responsabilidad (IMPORTANTE)</h6>
+                <p class="small"><strong>Ignis es una herramienta de apoyo administrativo, NO un sistema de misión crítica para emergencias vitales.</strong></p>
+                <p class="small">El Proveedor no se hace responsable de:</p>
+                <ul class="small text-white-50">
+                    <li>Retrasos en el despacho de unidades debido a fallos de conexión o software.</li>
+                    <li>Pérdida de datos por mal uso de las credenciales de la Institución.</li>
+                    <li>Daños indirectos derivados del uso o imposibilidad de uso del servicio.</li>
+                </ul>
+
+                <h6 class="text-accent fw-bold mt-3">4. Cuentas y Seguridad</h6>
+                <p class="small">La Institución es responsable de mantener la confidencialidad de sus credenciales (RUT y Claves). Cualquier actividad realizada desde sus cuentas se considerará autorizada por la Institución.</p>
+
+                <h6 class="text-accent fw-bold mt-3">5. Pagos y Suspensión</h6>
+                <p class="small">Si el servicio se contrata bajo modalidad de pago (SaaS), el incumplimiento en el pago de la suscripción faculta al Proveedor para suspender temporalmente el acceso hasta regularizar la deuda.</p>
+
+                <h6 class="text-accent fw-bold mt-3">6. Propiedad Intelectual</h6>
+                <p class="small">El código fuente, diseño y marca "systemaignis" son propiedad exclusiva del Proveedor. Los <strong>datos</strong> ingresados (nóminas, asistencia) son propiedad exclusiva de la Institución (Cliente).</p>
+
+                <h6 class="text-accent fw-bold mt-3">7. Modificaciones</h6>
+                <p class="small">Nos reservamos el derecho de modificar estos términos. Se notificará a los usuarios sobre cambios significativos a través de la plataforma.</p>
+
+                <hr class="border-secondary mt-4">
+                <p class="text-center text-muted small mb-0">Ignis Platform &copy; 2026</p>
+            </div>
+            <div class="modal-footer modal-footer-dark">
+                <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
     <script>
         // === CONFIGURACIÓN DE LINKS ===
         const DIRECTORIO = {
@@ -454,16 +506,15 @@
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         // 1. Detectamos si la URL tiene el ancla #privacidad
-        if (window.location.hash === "#privacidad") {
-            
-            // 2. Buscamos el modal por su ID
+        const hash = window.location.hash;
+
+        if (hash === "#privacidad") {
             const modalElement = document.getElementById('privacyModal');
-            
-            // 3. Usamos Bootstrap para abrirlo
-            if (modalElement) {
-                const privacyModal = new bootstrap.Modal(modalElement);
-                privacyModal.show();
-            }
+            if (modalElement) new bootstrap.Modal(modalElement).show();
+        } 
+        else if (hash === "#terminos") {
+            const modalElement = document.getElementById('termsModal');
+            if (modalElement) new bootstrap.Modal(modalElement).show();
         }
     });
 </script>
