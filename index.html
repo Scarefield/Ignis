@@ -3,31 +3,32 @@
 <head>
     <base target="_top">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ignis</title>
-    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 95C30 95 20 70 20 50C20 25 50 5 50 5C50 5 80 25 80 50C80 70 70 95 50 95Z" fill="%23ff4757"/><circle cx="85" cy="30" r="3" fill="%23ff4757"/><circle cx="15" cy="40" r="2" fill="%23ff4757"/></svg>'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Acceso Ignis</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* --- FONDO "EMBER DARK" (CSS Puro, optimizado) --- */
+        /* --- FONDO "EMBER DARK" --- */
         body { 
             background-color: #0a0a0a;
             background-image: radial-gradient(circle at 50% 100%, #2a0a0a 0%, #000000 100%);
-            min-height: 100vh; 
+            min-height: 100vh; /* Permite scroll si el contenido es alto */
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-family: 'Outfit', sans-serif;
             margin: 0;
-            overflow: hidden;
+            overflow-y: auto; /* Scroll vertical habilitado */
             position: relative;
-            
+            padding: 20px; /* Margen de seguridad para móviles */
         }
 
-        /* Animación de Chispas (Partículas) */
+        /* Animación de Chispas */
         .embers {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 0; overflow: hidden;
@@ -51,21 +52,21 @@
             100% { bottom: 100%; transform: translateX(-20px); opacity: 0; }
         }
 
-        /* --- TARJETA DE LOGIN (Dark Glass) --- */
+        /* --- TARJETA DE LOGIN --- */
         .login-wrapper {
-            position: relative; z-index: 1; width: 100%; padding: 15px;
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; 
-    }
+            position: relative; z-index: 1; width: 100%; 
+            display: flex; justify-content: center;
+        }
 
         .login-card { 
-            background: rgba(20, 20, 20, 0.75); /* Oscuro translúcido */
+            background: rgba(20, 20, 20, 0.85); /* Un poco más oscuro para legibilidad */
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 69, 0, 0.15); /* Borde sutil naranja */
+            border: 1px solid rgba(255, 69, 0, 0.15); 
             border-radius: 24px; 
             box-shadow: 0 25px 60px rgba(0,0,0,0.6); 
-            width: 100%; max-width: 420px; 
-            padding: 45px 35px;
+            width: 100%; 
+            max-width: 400px; /* Un poco más angosto para elegancia */
+            padding: 40px 30px;
             position: relative;
             animation: zoomIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
@@ -73,19 +74,19 @@
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         /* --- LOGO --- */
-        .logo-container { margin-bottom: 35px; text-align: center; }
+        .logo-container { margin-bottom: 30px; text-align: center; }
         .ignis-logo-svg {
-            width: 90px; height: 90px; margin-bottom: 15px;
+            width: 80px; height: 80px; margin-bottom: 10px;
             animation: pulseGlow 4s infinite ease-in-out; 
             filter: drop-shadow(0 0 15px rgba(220, 20, 60, 0.6));
         }
         .ignis-text {
-            font-family: 'Cinzel', serif; font-weight: 700; font-size: 2.5rem;
+            font-family: 'Cinzel', serif; font-weight: 700; font-size: 2.2rem;
             color: #ffffff; line-height: 1; letter-spacing: 3px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         .ignis-slogan {
-            font-family: 'Outfit', sans-serif; font-size: 0.75rem; text-transform: uppercase;
+            font-family: 'Outfit', sans-serif; font-size: 0.7rem; text-transform: uppercase;
             letter-spacing: 4px; color: #ff4500; font-weight: 600; margin-top: 8px; opacity: 0.9;
         }
         @keyframes pulseGlow {
@@ -94,28 +95,27 @@
         }
 
         /* --- FORMULARIOS --- */
-        .form-group { margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; }
         
         .form-label-custom {
             font-size: 0.7rem; font-weight: 700; color: #a0a0a0;
-            margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 1px;
         }
 
         .input-wrapper { position: relative; display: flex; align-items: center; }
 
         .input-icon {
-            position: absolute; left: 16px; color: #555; font-size: 1.1rem; transition: color 0.3s;
+            position: absolute; left: 15px; color: #555; font-size: 1rem; transition: color 0.3s;
         }
 
         .form-control-custom {
-            width: 100%; padding: 16px 16px 16px 50px;
+            width: 100%; padding: 12px 12px 12px 45px;
             border-radius: 12px; border: 1px solid #333;
             background: rgba(0, 0, 0, 0.3); 
-            font-size: 1rem; color: #e0e0e0;
+            font-size: 0.95rem; color: #e0e0e0;
             transition: all 0.3s ease; outline: none; appearance: none;
         }
 
-        /* Efecto "Magma" al enfocar */
         .form-control-custom:focus {
             background: rgba(20, 0, 0, 0.6);
             border-color: #d32f2f;
@@ -123,46 +123,87 @@
             color: white;
         }
         
-        .form-control-custom:focus + .input-icon { color: #d32f2f; }
-        
+        .form-control-custom:focus + .input-icon, 
+        .form-wrapper:focus-within .input-icon { color: #d32f2f; }
+
         .form-control-custom option { background: #1a1a1a; color: white; padding: 10px; }
 
-        /* Icono de flecha para selects */
         .select-arrow {
-            position: absolute; right: 20px; color: #555; pointer-events: none;
+            position: absolute; right: 15px; color: #555; pointer-events: none;
         }
 
         /* --- BOTÓN DE IGNICIÓN --- */
         .btn-ingresar {
-            width: 100%; padding: 18px;
+            width: 100%; padding: 14px;
             background: linear-gradient(135deg, #b71c1c 0%, #e65100 100%);
             border: none; border-radius: 12px;
-            color: white; font-weight: 700; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase;
+            color: white; font-weight: 700; font-size: 0.95rem; letter-spacing: 2px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 10px 30px rgba(183, 28, 28, 0.3);
-            margin-top: 15px; position: relative; overflow: hidden;
+            margin-top: 10px; position: relative; overflow: hidden;
         }
-
-        /* Brillo interno al pasar mouse */
+        .btn-ingresar:hover::after { left: 100%; }
+        .btn-ingresar:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(230, 81, 0, 0.4); }
+        .btn-ingresar:active { transform: translateY(0); }
         .btn-ingresar::after {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: 0.5s;
         }
-        .btn-ingresar:hover::after { left: 100%; }
 
-        .btn-ingresar:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(230, 81, 0, 0.4);
-        }
-        .btn-ingresar:active { transform: translateY(0); }
-
-        /* --- FOOTER --- */
+        /* --- FOOTER Y PRIVACIDAD --- */
         .footer-text {
-            text-align: center; margin-top: 35px;
-            font-size: 0.7rem; color: #666; font-weight: 500;
+            text-align: center; margin-top: 20px;
+            font-size: 0.65rem; color: #666; font-weight: 500;
+        }
+        
+        /* Estilo del enlace de privacidad */
+        .privacy-link {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+        .privacy-link:hover {
+            color: #ff4757;
+            text-decoration: underline;
         }
 
+        /* --- AJUSTES RESPONSIVOS (MÓVIL) --- */
+        @media (max-width: 480px) {
+            body { 
+                align-items: flex-start; /* Evita que el teclado tape el input */
+                padding-top: 40px; 
+            }
+            .login-card {
+                padding: 25px 20px; /* Relleno reducido */
+                max-width: 100%; 
+                border-radius: 20px;
+            }
+            .ignis-logo-svg { width: 65px; height: 65px; }
+            .ignis-text { font-size: 1.8rem; }
+            .ignis-slogan { font-size: 0.6rem; }
+            .form-control-custom { font-size: 16px; /* Evita zoom iOS */ }
+        }
+
+        /* --- ESTILOS DEL MODAL OSCURO --- */
+        .modal-content-dark {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 69, 0, 0.3);
+        }
+        .modal-header-dark {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .modal-footer-dark {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .text-accent { color: #ff4757; }
+        .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
     </style>
 </head>
 <body>
@@ -214,9 +255,46 @@
             </button>
 
             <div class="footer-text">
-                &copy; 2026 Ignis Platform. Todos los derechos reservados.
+                &copy; 2026 Ignis Platform.
             </div>
+            
+            <a href="#" class="privacy-link" data-bs-toggle="modal" data-bs-target="#privacyModal">
+                <i class="fas fa-lock me-1"></i> Política de Privacidad
+            </a>
 
+        </div>
+    </div>
+
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content modal-content-dark">
+                <div class="modal-header modal-header-dark">
+                    <h5 class="modal-title"><i class="fas fa-shield-alt text-accent me-2"></i>Política de Privacidad</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="text-accent fw-bold">1. Introducción</h6>
+                    <p class="small">La plataforma <strong>Ignis</strong> opera bajo un modelo de gestión de datos centralizado donde la Institución (Cuerpo de Bomberos) actúa como responsable de los datos.</p>
+                    
+                    <h6 class="text-accent fw-bold mt-3">2. No se requiere cuenta de Google</h6>
+                    <p class="small">El uso de Ignis <strong>no requiere</strong> que los usuarios finales posean o vinculen una cuenta personal de Google. La autenticación se realiza mediante credenciales internas (RUT). La aplicación no solicita acceso a correos, fotos o archivos personales.</p>
+
+                    <h6 class="text-accent fw-bold mt-3">3. Almacenamiento de Datos</h6>
+                    <p class="small">Toda la información se almacena de forma segura en la infraestructura de <strong>Google Cloud</strong> del proveedor del servicio. Los datos de cada Compañía se encuentran aislados y protegidos.</p>
+
+                    <h6 class="text-accent fw-bold mt-3">4. Uso de la Información</h6>
+                    <p class="small">Recopilamos datos operativos (asistencia, guardia, inventario) exclusivamente para la gestión administrativa de la institución. <strong>No vendemos ni compartimos datos con terceros.</strong></p>
+
+                    <h6 class="text-accent fw-bold mt-3">5. Seguridad</h6>
+                    <p class="small">El tráfico de datos está encriptado mediante protocolo SSL/HTTPS. Solo el personal autorizado por la Compañía (Oficiales) tiene acceso a la modificación de registros.</p>
+                    
+                    <hr class="border-secondary">
+                    <p class="text-center text-muted small mb-0">Ignis Platform &copy; 2026</p>
+                </div>
+                <div class="modal-footer modal-footer-dark">
+                    <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -234,7 +312,6 @@
             const cuerpo = document.getElementById('cuerpo').value;
             const selectCia = document.getElementById('compania');
             
-            // Efecto de reset con animación simple
             selectCia.style.opacity = '0.5';
             
             setTimeout(() => {
@@ -245,7 +322,6 @@
                 if (DIRECTORIO[cuerpo]) {
                     const cias = Object.keys(DIRECTORIO[cuerpo]);
                     
-                    // Ordenamos: Comandancia primero, luego números
                     cias.sort((a, b) => {
                         if(a === 'comandancia') return -1;
                         if(b === 'comandancia') return 1;
@@ -264,10 +340,9 @@
                         option.value = key;
                         option.text = nombre;
                         
-                        // Estilo especial para Comandancia en la lista
                         if(key === "comandancia") {
                             option.style.fontWeight = "bold";
-                            option.style.color = "#ff6b6b"; 
+                            option.style.color = "#ff4757"; 
                         }
 
                         selectCia.add(option);
@@ -284,7 +359,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Faltan datos',
-                    text: 'Por favor seleccione Cuerpo y Unidad para continuar',
+                    text: 'Por favor seleccione Cuerpo y Unidad',
                     confirmButtonColor: '#d32f2f',
                     background: '#1a1a1a',
                     color: '#fff'
@@ -295,7 +370,6 @@
             const urlDestino = DIRECTORIO[cuerpo][cia];
             
             if (urlDestino) {
-                // Alerta estilo Dark con carga
                 Swal.fire({
                     title: 'Iniciando Sistema Ignis',
                     html: '<div style="margin-top:10px; font-size:0.9rem; color:#aaa">Estableciendo conexión segura...</div>',
@@ -309,7 +383,6 @@
                         Swal.showLoading();
                     }
                 }).then(() => {
-                    // Transición suave al iframe
                     document.body.style.transition = "opacity 0.5s";
                     document.body.innerHTML = `
                         <div style="background-color:#000; width:100%; height:100vh; display:flex; justify-content:center; align-items:center;">
